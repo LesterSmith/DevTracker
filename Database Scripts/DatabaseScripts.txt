@@ -1,0 +1,2030 @@
+﻿-- **** Tables ****
+USE [DevTrkr]
+GO
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[ProjectFiles]    Script Date: 5/12/2020 3:28:33 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[ProjectFiles](
+	[ID] [uniqueidentifier] NOT NULL,
+	[DevProjectName] [varchar](255) NOT NULL,
+	[RelativeFileName] [varchar](50) NOT NULL,
+	[SyncID] [uniqueidentifier] NULL,
+	[GitURL] [varchar](255) NULL,
+	[CodeLines] [int] NOT NULL,
+	[CommentLines] [int] NOT NULL,
+	[BlankLines] [int] NOT NULL,
+	[DesignerLines] [int] NOT NULL,
+	[UpdateCount] [int] NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[CreatedBy] [varchar](50) NOT NULL,
+	[LastUpdate] [datetime] NULL,
+	[LastUpdatedBy] [varchar](50) NULL,
+ CONSTRAINT [PK_ProjectFiles] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+
+
+/****** Object:  Table [dbo].[ProjNameMatches]    Script Date: 2/22/2020 12:26:27 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[ProjNameMatches](
+	[ID] [uniqueidentifier] NOT NULL,
+	[Regex] [varchar](max) NOT NULL,
+	[RegexGroupName] [varchar](50) NOT NULL,
+	[UnknownValue] [varchar](50) NOT NULL,
+	[AppName] [varchar](50) NOT NULL,
+	[ProjNameReplaces] [varchar](max) NULL,
+	[ProjNameConcat] [varchar](255) NULL,
+	[IsIde] [bit] NULL,
+	[Description] [varchar](50) NULL,
+	[AlternateProjName] [varchar](255) NULL,
+	[IsDBEngine] bit Null
+ CONSTRAINT [PK_ProjNameMatches] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[DevProjects]    Script Date: 2/21/2020 3:53:26 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[DevProjects](
+	[ID] [uniqueidentifier] NOT NULL,
+	[DevProjectName] [varchar](255) NOT NULL,
+	[DevProjectPath] [varchar](255) NULL,
+	[ITProjectID] [varchar](255) NULL,
+	[Machine] [varchar](255) NULL,
+	[UserName] [varchar](50) NULL,
+	[IDEAppName] [varchar](50) NULL,
+	[CreatedDate] DateTime NULL,
+	[DatabaseProject] bit null
+ CONSTRAINT [PK_DevProjects] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[FileActivity]    Script Date: 2/21/2020 3:53:56 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[FileActivity](
+	[ID] [uniqueidentifier] NOT NULL,
+	[Machine] [varchar](255) NOT NULL,
+	[DevProjName] [varchar](255) NOT NULL,
+	[Filename] [varchar](255) NOT NULL,
+	[Username] [varchar](50) NOT NULL,
+	[FileLength] [bigint] NULL,
+	[LastAction] [varchar](20) NOT NULL,
+	[CreatedDate] [datetime] NULL,
+	[CreatedBy] [varchar](50) NULL,
+	[LastUpdate] [datetime] NOT NULL,
+	[UpdatedBy] [varchar](50) NOT NULL,
+	[DeletedDate] [datetime] NULL,
+	[DeletedBy] [varchar](50) NULL,
+	[UpdateCount] [int] NULL,
+	[Deleted] [bit] NULL,
+	[DevProjectPath] [varchar](255) NULL,
+	[CodeLines] [int] NULL,
+	[CommentLines][int] NULL,
+	[BlankLines][int] NULL,
+	[DesignerLines][int]NULL,
+ CONSTRAINT [PK_FileActivity] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[Meetings]    Script Date: 2/21/2020 3:54:58 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[Meetings](
+	[ID] [uniqueidentifier] NOT NULL,
+	[Subject] [varchar](255) NOT NULL,
+	[Organizer] [varchar](255) NOT NULL,
+	[StartTime] [datetime] NOT NULL,
+	[EndTime] [datetime] NOT NULL,
+	[Recurring] [bit] NOT NULL,
+	[UserName] [varchar](50) NULL,
+ CONSTRAINT [PK_Meetings] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[NotableApplications]    Script Date: 2/21/2020 3:55:23 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[NotableApplications](
+	[ID] [uniqueidentifier] NOT NULL,
+	[AppName] [varchar](50) NOT NULL,
+	[AppFriendlyName] [varchar](100) NOT NULL,
+	[InterestingTitle] [varchar](255) NULL,
+ CONSTRAINT [PK_NotableApplications] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[NotableFileTypes]    Script Date: 2/21/2020 3:55:51 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[NotableFileTypes](
+	[ID] [uniqueidentifier] NOT NULL,
+	[Extension] [varchar](50) NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[IDEProjectExtension][varchar](50) NULL,
+	[CountLines][int] NULL
+ CONSTRAINT [PK_NotableFileTypes] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[ProjNameMatches]    Script Date: 3/6/2020 1:44:15 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[ProjNameMatches](
+	[ID] [uniqueidentifier] NOT NULL,
+	[Regex] [varchar](max) NOT NULL,
+	[RegexGroupName] [varchar](50) NOT NULL,
+	[UnknownValue] [varchar](50) NOT NULL,
+	[AppName] [varchar](50) NOT NULL,
+	[ProjNameReplaces] [varchar](max) NULL,
+	[ProjNameConcat] [varchar](255) NULL,
+	[ConcatChar] [varchar](50) NULL,
+	[IsIde] [bit] NULL,
+	[Description] [varchar](50) NULL,
+	[IsDBEngine] [bit] Null
+ CONSTRAINT [PK_ProjNameMatches] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[Users]    Script Date: 3/6/2020 1:48:24 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[Users](
+	[ID] [uniqueidentifier] NOT NULL,
+	[FirstName] [varchar](50) NOT NULL,
+	[LastName] [varchar](50) NOT NULL,
+	[UserName] [varchar](50) NOT Null,
+	[Admin] [bit] NOT NULL,
+	[Manager] [bit] NOT NULL,
+	[Developer] [bit] NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[CreatedBy] [varchar](50) NOT NULL,
+	[UpdatedDate] [datetime] NULL,
+	[UpdatedBy] [varchar](50) NULL,
+ CONSTRAINT [PK_Users] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[WindowEvents]    Script Date: 2/21/2020 3:56:38 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[WindowEvents](
+	[ID] [uniqueidentifier] NOT NULL,
+	[StartTime] [datetime] NOT NULL,
+	[WindowTitle] [varchar](255) NOT NULL,
+	[AppName] [varchar](50) NOT NULL,
+	[ModuleName] [varchar](50) NOT NULL,
+	[DevProjectName] [varchar](100) NOT NULL,
+	[ITProjectID] [varchar](255) NULL,
+	[EndTime] [datetime] NULL,
+	[UserName] [varchar](50) NULL,
+	[MachineName] [varchar](50) NULL,
+	[UserDisplayName] [varchar](50) NULL,
+	[SyncID] [uniqueidentifier] NULL,
+ CONSTRAINT [PK_WindowEvents] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+--********* index
+USE [DevTrkr]
+GO
+
+/****** Object:  Index [NonClusteredIndex-20200307-112453]    Script Date: 3/7/2020 11:27:11 AM ******/
+CREATE NONCLUSTERED INDEX [NonClusteredIndex-20200307-112453] ON [dbo].[WindowEvents]
+(
+	[AppName] ASC,
+	[DevProjectName] ASC,
+	[UserName] ASC,
+	[MachineName] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON)
+GO
+
+USE [DevTrkr]
+GO
+
+/****** Object:  Table [dbo].[ProjectSync]    Script Date: 5/11/2020 11:55:00 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+SET ANSI_PADDING ON
+GO
+
+CREATE TABLE [dbo].[ProjectSync](
+	[ID] [uniqueidentifier] NOT NULL,
+	[DevProjectName] [varchar](255) NOT NULL,
+	[CreatedDate] [datetime] NOT NULL,
+	[DevProjectCount] [int] NOT NULL,
+	[GitURL] [varchar](255) NULL,
+ CONSTRAINT [PK_ProjectSync] PRIMARY KEY CLUSTERED 
+(
+	[ID] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+
+GO
+
+SET ANSI_PADDING OFF
+GO
+
+
+
+
+
+
+
+
+
+--**** Stored Procedures
+Use DevTrkr
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 3/7/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetUsers] 
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select * from DevTrkr..Users
+	order by LastName, FirstName
+END
+GO
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[CheckForInsertingNewProjectPath]    Script Date: 4/30/2020 9:44:08 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 20/28/2019
+-- Changed 3/2/2020
+-- Since Window events can now insert a project, but w/o a path
+-- if the project exists on the machic and username, it should
+-- update the path in the existing project, otherwise
+-- insert a new project as before
+-- Changed 4/29/20\
+-- Remove the update as WindowEvents no longer insert a project b/c it does not know the path
+-- But FileAnalyzer always does.
+-- =============================================
+CREATE PROCEDURE [dbo].[CheckForInsertingNewProjectPath] 
+	@DevProjectName varchar (255),
+	@DevProjectPath varchar (255),
+	@ITProjectID varchar (255),
+	@Machine varchar (255),
+	@UserName varchar (50),
+	@IDEAppName varchar (50),
+	@DatabaseProject bit,
+	@SyncID uniqueidentifier,
+	@ProjFileExt varchar (50),
+	@DevSLNPath varchar (255),
+	@GitURL varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+	if not exists(Select 1 From DevTrkr..DevProjects with (nolock)
+	          Where DevProjectName = @DevProjectName
+			  and DevProjectName = @DevProjectPath
+			  And UserName = @UserName
+			  And Machine = @Machine)
+		Begin
+			Insert into DevTrkr..DevProjects
+			(ID, DevProjectName, DevProjectPath, ITProjectID, Machine, UserName, IDEAppName, CreatedDate, DatabaseProject, SyncID, ProjFileExt, DevSLNPath, GitURL )
+			Values
+			(newid(), @DevProjectName, @DevProjectPath, @ITProjectID, @Machine, @UserName, @IDEAppName, getdate(), @DatabaseProject, @SyncID, @ProjFileExt, @DevSLNPath, @GitURL )
+			Select 1
+		End
+	else
+		-- only FileAnalyzer when saving a project file knows the path
+		-- Project already exists, just update the path
+		--if @DevProjectName not like '%unknown%' and @DevProjectPath not like '%unknown%'
+		Begin
+			Select 0
+			--Update DevTrkr..DevProjects
+			--Set DevProjectPath = @DevProjectPath, CreatedDate = getdate()
+			--Where DevProjectName = @DevProjectName
+			--And DevProjectPath != @DevProjectPath
+			--And Machine = @Machine
+			--And UserName = @UserName
+		End
+END
+GO
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[InsertUpdateProjectFiles]    Script Date: 5/14/2020 4:37:09 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/13/2020
+-- =============================================
+ALTER PROCEDURE [dbo].[InsertUpdateProjectFiles] 
+	@DevProjectName varchar (255),
+	@RelativeFileName varchar (50),
+	@SyncID uniqueidentifier,
+	@GitURL varchar (255),
+	@CodeLines int,
+	@CommentLines int,
+	@BlankLines int,
+	@DesignerLines int,
+	@CreatedBy varchar (50),
+	@LastUpdatedBy varchar (50)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+	Declare @CurrTime DateTime = getdate()
+	
+	--if not a collaborative project syncID and gitUrl will be null
+	If not exists (Select 1 From DevTrkr..ProjectFiles with (nolock) 
+			  where DevProjectName = @DevProjectName
+			  and RelativeFileName = @RelativeFileName
+			  and (SyncID = @SyncID and GitURL = @GitURL) or (SyncId is null and isnull(GitURL,'')=''))
+
+	Begin
+		Insert into DevTrkr..ProjectFiles
+		(ID, DevProjectName, RelativeFileName, SyncID, GitURL, CodeLines, CommentLines, BlankLines, DesignerLines, UpdateCount, CreatedDate, CreatedBy, LastUpdate, LastUpdatedBy )
+		Values
+		(newid(), @DevProjectName, @RelativeFileName, @SyncID, @GitURL, @CodeLines, @CommentLines, @BlankLines, @DesignerLines, 1, @CurrTime, @CreatedBy, null, @LastUpdatedBy )
+	End
+	Else
+	Begin
+		Update DevTrkr..ProjectFiles
+		Set CodeLines = @CodeLines,
+			CommentLines = @CommentLines, 
+			BlankLines = @BlankLines, 
+			DesignerLines = @DesignerLines, 
+			UpdateCount = UpdateCount + 1, 
+			LastUpdate = @CurrTime, 
+			LastUpdatedBy = @LastUpdatedBy
+			where DevProjectName = @DevProjectName
+			and RelativeFileName = @RelativeFileName
+			--and SyncID = @SyncID
+			--and GitURL = @GitURL
+			and (SyncID = @SyncID and GitURL = @GitURL) or (SyncId is null and isnull(GitURL,'')='')
+
+	End
+END
+
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetDeveloperNames]    Script Date: 2/21/2020 3:59:56 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 11/20/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDeveloperNames] 
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select Distinct UserName, UserDisplayName 
+	From DevTrkr..WindowEvents with (nolock)
+	Group by USERName, UserDisplayName
+	Order by UserName, UserDisplayName
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetDevProjects]    Script Date: 2/21/2020 4:00:23 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 11/20/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDevProjects] 
+	@Machine varchar(255) = null,
+	@UserName varchar(255) = null	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	If @UserName is null or @Machine is null
+	Begin
+		Select *
+		From DevTrkr..DevProjects with (nolock)
+		Order by DevProjectName
+	End
+	Else
+	Begin
+		Select *
+		From DevTrkr..DevProjects with (nolock)
+		Where Machine = @Machine
+		And UserName = @UserName
+		Order by DevProjectName
+	End
+END
+
+
+GO
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetConfigOptions]    Script Date: 3/26/2020 11:38:08 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 3/2/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetConfigOptions] 
+	@SpecificOption varchar(255)=''
+AS
+BEGIN
+	IF @SpecificOption = ''
+		Begin
+		-- SET NOCOUNT ON added to prevent extra result sets from
+		-- interfering with SELECT statements.
+		SET NOCOUNT ON;
+
+		Select * 
+		From DevTrkr..ConfigOptions
+		Order by Name
+		End
+	Else
+		Begin
+			Select * 
+			From DevTrkr..ConfigOptions
+			Where Name = @SpecificOption
+			Order by Name
+		End
+END
+
+GO
+
+USE DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/14/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateDevProjectsWithSyncIDAndGitURL] 
+	@ID uniqueidentifier,
+	@SyncID uniqueidentifier,
+	@GitURL varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update DevTrkr..DevProjects
+	Set SyncID = @SyncID,
+		GitURL = @GitURL
+	Where ID = @ID
+END
+GO
+
+
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/14/2020
+-- plan is to insert only when we have a gitURL to trigger it
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateProjectSync] 
+	@ID uniqueidentifier,
+	@DevProjectName varchar (255),
+	@CreatedDate datetime,
+	@DevProjectCount int,
+	@GitURL varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    If Not Exists(Select 1 From DevTrkr..ProjectSync with (nolock) 
+				  where DevProjectName = @DevProjectName
+				  And GitURL = @GitURL)
+	Begin
+		Insert into DevTrkr..ProjectSync
+		(ID, DevProjectName, CreatedDate, DevProjectCount, GitURL )
+		Values
+		(@ID, @DevProjectName, @CreatedDate, 1, @GitURL )
+	End
+	Else
+	Begin
+		Update DevTrkr..ProjectSync
+		Set DevProjectCount = DevProjectCount + 1
+	End
+END
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetLastWindowEventWritten]    Script Date: 2/21/2020 4:00:44 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 11/5/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[GetLastWindowEventWritten]
+	@ID uniqueidentifier 
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	Select * 
+	From DevTrkr..WindowEvents w with(nolock)
+	Where ID = @ID
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetNotableApplications]    Script Date: 2/21/2020 4:01:17 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 11/6/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[GetNotableApplications] 
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select * 
+	From DevTrkr..NotableApplications with (nolock)
+	Order by AppName
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetNotableFileExtensions]    Script Date: 2/21/2020 4:01:47 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/30/19
+-- =============================================
+CREATE PROCEDURE [dbo].[GetNotableFileExtensions] 
+	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select * 
+	From DevTrkr..NotableFileTypes with (nolock)
+	Order by Extension
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetProjectNameMatches]    Script Date: 2/21/2020 4:02:05 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 2/21/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetProjectNameMatches] 
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT * From DevTrkr..ProjNameMatches
+	Order by AppName, sequence
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetProjectTotals]    Script Date: 2/21/2020 4:02:31 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith	
+-- Create date: 12/18/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[GetProjectTotals] 
+	@Projects varchar(max)
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    select DevProjectName as [Project Name],
+	  sum(TotalSeconds) / 3600 as Hours, 
+	  (sum(TotalSeconds) % 3600) / 60 as Minutes, 
+	  sum(TotalSeconds) % 60 as Seconds
+	from
+	(
+		select DevProjectName, DateDiff(second, StartTime, EndTime) as TotalSeconds 
+		from DevTrkr..WindowEvents
+		where AppName='devenv'
+	) x
+	Group by DevProjectName
+
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetUserDisplayName]    Script Date: 2/21/2020 4:02:49 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 2/4/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetUserDisplayName] 
+	@Username varchar(50),
+	@MachineName varchar(50)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    -- Insert statements for procedure here
+	SELECT Top 1 UserDisplayName
+	From DevTrkr..WindowEvents with (nolock)
+	Where UserName = @Username
+	and MachineName = @MachineName
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[GetWindowEvents]    Script Date: 2/21/2020 4:03:14 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 9/15/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[GetWindowEvents] 
+	@UserName varchar(50) = null,
+	@DevProjectName varchar(50) = null,
+	@StartTime DateTime = null,
+	@EndTime DateTime = null
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	-- Return all data for one specified project for one specified user for time period
+	If isnull(@UserName,'') != '' and isnull(@DevProjectName,  '') != ''
+	Begin
+		print '1'
+		SELECT *, CAST(EndTime - StartTime AS TIME) as ElapsedTime
+		From DevTrkr..WindowEvents with (nolock)
+		Where UserName = @UserName 
+		And DevProjectName = @DevProjectName
+		And StartTime >= @StartTime and EndTime <= @EndTime
+		order by UserName, DevProjectName, StartTime
+	End
+
+	-- Return all projects for UserName for time period
+	Else If isnull(@UserName,'') != '' and isnull(@DevProjectName,'') = ''
+	Begin
+		print '2'
+		SELECT *, CAST(EndTime - StartTime AS TIME) as ElapsedTime
+		From DevTrkr..WindowEvents with (nolock)
+		Where UserName = @UserName 
+		And StartTime >= @StartTime and EndTime <= @EndTime
+		order by UserName, DevProjectName, StartTime
+	End
+
+	-- Return one project for all users for time period
+	Else If isnull(@UserName,'') = '' and isnull(@DevProjectName,'') != ''
+	Begin
+		print '3'
+		SELECT *, CAST(EndTime - StartTime AS TIME) as ElapsedTime
+		From DevTrkr..WindowEvents with (nolock)
+		Where DevProjectName = @DevProjectName
+		And StartTime >= @StartTime and EndTime <= @EndTime
+		order by UserName, DevProjectName, StartTime
+	End
+	Else
+	-- Return All Projects for all users for specified period
+	Begin
+		print '4'
+		SELECT *, CAST(EndTime - StartTime AS TIME) as ElapsedTime
+		From DevTrkr..WindowEvents with (nolock)
+		Where StartTime >= @StartTime and EndTime <= @EndTime
+		order by UserName, DevProjectName, StartTime
+	End
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[InsertUpdateFileActivity]    Script Date: 2/21/2020 4:03:33 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 6/6/19
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateFileActivity] 
+	@Machine varchar (255),
+	@DevProjName varchar (255),
+	@Filename varchar (255),
+	@Username varchar (50),
+	@FileLength bigint,
+	@LastAction varchar (20),
+	@CreatedBy varchar (50),
+	@UpdatedBy varchar (50),
+	@UpdateCount int,
+	@DevProjectPath varchar (255),
+	@CodeLines int=0,
+	@CommentLines int=0,
+	@BlankLines int=0,
+	@DesignerLines int=0
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Declare @ID uniqueidentifier=null
+	
+	-- remove the check for DevProjectPath  in the where clause, if there is no
+	-- value in the DevProjectPath for a particular path the following select 1 will fail
+	-- and project path has nothing to do with fileactivity, only DevProjects
+	Set @ID = (Select top 1 Id from DevTrkr..FileActivity with (nolock)
+				Where Machine = @Machine 
+				and Username = @Username
+				--and [DevProjectPath] = @DevProjectPath
+				and [Filename] = @FileName
+				Order by LastUpdate desc)
+				
+	IF @ID is null
+	Begin
+	print 'insert'
+		Insert into DevTrkr..FileActivity
+		(ID, Machine, [DevProjectPath], [Filename], Username, LastAction, CreatedDate, CreatedBy, LastUpdate, UpdatedBy, UpdateCount, DevProjName, FileLength, CodeLines, CommentLines, BlankLines, DesignerLines)
+		Values
+		(Newid(), @Machine, @DevProjectPath, @FileName, @Username, @LastAction, getdate(), @UpdatedBy, getdate(), @UpdatedBy, @UpdateCount, @DevProjName, @FileLength, @CodeLines, @CommentLines, @BlankLines, @DesignerLines)
+	End
+	Else
+	Begin
+	print 'update'
+		Update DevTrkr..FileActivity
+		Set FileLength = @FileLength,
+		    LastAction = @LastAction, 
+			LastUpdate = getdate(), 
+			UpdatedBy = @UpdatedBy,
+			UpdateCount = UpdateCount + 1,
+			CodeLines = @CodeLines,
+			CommentLines = @CommentLines,
+			BlankLines = @BlankLines,
+			DesignerLines = @DesignerLines
+		Where ID = @ID
+	End
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[InsertWindowEvent]    Script Date: 5/15/2020 5:59:04 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 9/10/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertWindowEvent]
+	@ID UniqueIdentifier, 
+	@StartTime DateTime,
+	@WindowTitle varchar(255),
+	@AppName varchar(50),
+	@ModuleName varchar(50),
+	@EndTime DateTime,
+	@DevProjectName varchar(255),
+	@ITProjectID varchar(255)= null,
+	@UserName varchar(50) = null,
+	@MachineName varchar(50)=null,
+	@UserDisplayName varchar(50) =null,
+	@SyncID uniqueidentifier = null
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+	Insert into DevTrkr..WindowEvents
+	(ID, StartTime, WindowTitle, AppName, ModuleName, EndTime, DevProjectName, ITProjectID, UserName, MachineName, UserDisplayName, SyncID)
+	Values
+	(@ID, @StartTime, @WindowTitle, @AppName, @ModuleName, @EndTime, @DevProjectName, @ITProjectID, @UserName, @MachineName, @UserDisplayName, @SyncID)
+END
+
+GO
+
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[IsFileInDevPrjPath]    Script Date: 2/21/2020 4:04:19 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 10/24/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[IsFileInDevPrjPath] 
+	@FileName varchar(255),
+	@Machine varchar(255),
+	@UserName varchar(50)
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+	
+	Select Id, DevProjectName, DevProjectPath, ITProjectID, Machine, UserName
+	From DevTrkr..DevProjects with (nolock)
+	Where Machine = @Machine 
+	And UserName = @UserName
+	And @FileName like DevProjectPath + '%'
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[UpadateDevProjNameInWindowEvent]    Script Date: 2/21/2020 4:04:50 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 11/5/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[UpadateDevProjNameInWindowEvent]
+	@ID uniqueidentifier,
+	@DevProjectName varchar (100)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+	Update DevTrkr..WindowEvents
+	Set DevProjectName = @DevProjectName
+	Where ID = @ID
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[UpdateUnknownProjectNameinVSCode]    Script Date: 3/7/2020 11:10:45 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 1/8/2020
+-- =============================================
+ALTER PROCEDURE [dbo].[UpdateUnknownProjectNameForIDEMatch] 
+	@DevProjectName varchar(255),
+	@AppName varchar(50),
+	@UnknownKey varchar(50),
+	@Machine varchar(50),
+	@UserName varchar(50)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update DevTrkr..WindowEvents
+	Set DevProjectName = @DevProjectName
+	Where AppName = @AppName 
+	And DevProjectName = @UnknownKey
+	And MachineName = @Machine
+	And UserName = @UserName
+END
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[UpdateWindowEvent]    Script Date: 2/21/2020 4:05:35 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 11/18/19
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateWindowEvent] 
+	@ID UniqueIdentifier, 
+	@StartTime DateTime,
+	@WindowTitle varchar(255),
+	@AppName varchar(50),
+	@ModuleName varchar(50),
+	@EndTime DateTime,
+	@DevProjectName varchar(255),
+	@ITProjectID varchar(255)= null,
+	@UserName varchar(50) = null,
+	@MachineName varchar(50)=null,
+	@UserDisplayName varchar(50)=null
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update DevTrkr..WindowEvents
+	Set StartTime = @StartTime,
+		WindowTitle = @WindowTitle, 
+		AppName = @AppName, 
+		ModuleName = @ModuleName, 
+		DevProjectName = @DevProjectName, 
+		ITProjectID = @ITProjectID, 
+		EndTime = @EndTime, 
+		UserName = @UserName,
+		MachineName = @MachineName,
+		UserDisplayName = @UserDisplayName
+Where ID = @ID
+
+END
+
+GO
+
+
+USE [DevTrkr]
+GO
+
+/****** Object:  StoredProcedure [dbo].[UpdateWindowEventElapsedTime]    Script Date: 2/21/2020 4:08:43 PM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 9/10/2019
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateWindowEventElapsedTime]
+	@ID UniqueIdentifier,
+	@ElapsedTime DateTime
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+	Update DevTrkr..WindowEvents
+	Set ElapsedTime=@ElapsedTime
+	Where ID = @ID
+END
+
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 3/27/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateConfigOptions] 
+	@ID uniqueidentifier,
+	@Name varchar (250),
+	@Value varchar (max),
+	@Description varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    If exists(select 1 from DevTrkr..ConfigOptions with (nolock) where ID = @ID)
+	Begin
+		Update DevTrkr..ConfigOptions
+		Set Name = @Name, 
+		Value = @Value, 
+		Description = @Description
+		Where ID = @ID
+	End
+	Else
+	Begin
+		Insert into DevTrkr..ConfigOptions
+		(ID, Name, Value, Description )
+		Values
+		(@ID, @Name, @Value, @Description )
+	End
+END
+GO
+
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[InsertUpdateDevProject]    Script Date: 5/13/2020 4:20:51 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/1/2020
+-- =============================================
+Create PROCEDURE [dbo].[InsertUpdateDevProject] 
+	@ID uniqueidentifier,
+	@DevProjectName varchar (255),
+	@DevProjectPath varchar (255),
+	@Machine varchar (255),
+	@UserName varchar (50),
+	@IDEAppName varchar (50)=null,
+	@CreatedDate datetime,
+	@CompletedDate datetime = null,
+	@DatabaseProject bit,
+	@SyncID uniqueidentifier=null,
+	@ProjFileExt varchar (50)=null,
+	@DevSLNPath varchar (255)=null,
+	@GitURL varchar (255)=null
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    if not exists(select 1 from DevTrkr..DevProjects with (nolock) where ID = @ID)
+	Begin
+		Insert into DevTrkr..DevProjects
+		(ID, DevProjectName, DevProjectPath, Machine, UserName, IDEAppName, CreatedDate, CompletedDate, DatabaseProject, SyncID, ProjFileExt, DevSLNPath, GitURL )
+		Values
+		(@ID, @DevProjectName, @DevProjectPath, @Machine, @UserName, @IDEAppName, @CreatedDate, @CompletedDate, @DatabaseProject, @SyncID, @ProjFileExt, @DevSLNPath, @GitURL )
+	End
+	Else
+	Begin
+		Update DevTrkr..DevProjects
+		Set SyncID = @SyncID,
+		GitURL = @GitURL,
+		CompletedDate = @CompletedDate
+		Where ID = @ID
+	End
+END
+
+
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[InsertUpdateProjNameMatches]    Script Date: 3/29/2020 12:30:16 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 2/28/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateProjNameMatches] 
+	@ID uniqueidentifier,
+	@Regex varchar (max),
+	@RegexGroupName varchar (50),
+	@UnknownValue varchar (50),
+	@AppName varchar (50),
+	@ProjNameReplaces varchar (max),
+	@ProjNameConcat varchar (255),
+	@ConcatChar varchar (50),
+	@IsIde bit,
+	@Description varchar (50),
+	@AlternateProjName varchar (255),
+	@Sequence int,
+	@IsDBEngine bit
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+	if exists(select 1 from DevTrkr..projnamematches where id=@ID)
+	Begin
+		Update DevTrkr..projnamematches
+		Set Regex = @Regex, 
+		RegexGroupName = @RegexGroupName, 
+		UnknownValue = @UnknownValue, 
+		AppName = @AppName, 
+		ProjNameReplaces = @ProjNameReplaces, 
+		ProjNameConcat = @ProjNameConcat, 
+		ConcatChar = @ConcatChar, 
+		IsIde = @IsIde
+		Where ID = @ID
+	End
+	else
+	Begin
+		Insert into DevTrkr..projnamematches
+		(
+			ID,
+			Regex,
+			RegexGroupName,
+			UnknownValue,
+			AppName,
+			ProjNameReplaces,
+			ProjNameConcat,
+			ConcatChar,
+			IsIde,
+			Description,
+			AlternateProjName,
+			Sequence,
+			IsDBEngine
+		)
+		Values
+		(
+			@ID, 
+			@Regex, 
+			@RegexGroupName, 
+			@UnknownValue, 
+			@AppName, 
+			@ProjNameReplaces, 
+			@ProjNameConcat, 
+			@ConcatChar, 
+			@IsIde, 
+			@Description, 
+			@AlternateProjName, 
+			@Sequence, 
+			@IsDBEngine 
+		)
+	End
+END
+
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 3/29/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateNotableFileTypes] 
+	@ID uniqueidentifier,
+	@Extension varchar (50),
+	@CreatedDate datetime,
+	@IDEProjectExtension varchar (50),
+	@CountLines bit
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    if not exists(select 1 from DevTrkr..NotableFileTypes with (nolock) where ID = @ID)
+	Begin
+		Insert into DevTrkr..NotableFileTypes
+		(
+			ID,
+			Extension,
+			CreatedDate,
+			IDEProjectExtension,
+			CountLines
+		)
+		values
+		(
+			@ID, 
+			@Extension, 
+			@CreatedDate, 
+			@IDEProjectExtension,
+			@CountLines
+		)
+	End
+	Else
+	Begin
+		Update DevTrkr..NotableFileTypes
+		Set Extension = @Extension, 
+		CreatedDate = @CreatedDate, 
+		IDEProjectExtension = @IDEProjectExtension
+		Where ID = @ID
+	End 
+END
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 3/29/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateNotableApplications]
+	@ID uniqueidentifier,
+	@AppName varchar (50),
+	@AppFriendlyName varchar (100),
+	@InterestingTitle varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    if not exists(select 1 from DevTrkr..NotableApplications with (nolock) where ID = @ID)
+	Begin
+		Insert into DevTrkr..NotableApplications
+		(ID, AppName, AppFriendlyName, InterestingTitle )
+		Values
+		(@ID, @AppName, @AppFriendlyName, @InterestingTitle )
+	End
+	Else
+	Begin
+		Update DevTrkr..NotableApplications
+		Set AppName = @AppName, 
+		AppFriendlyName = @AppFriendlyName, 
+		InterestingTitle = @InterestingTitle
+		Where ID = @ID
+	End
+
+END
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/1/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[DeleteConfigOption] 
+	@ID uniqueidentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Delete DevTrkr..ConfigOptions
+	Where ID=@ID
+END
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/1/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[DeleteDevProjects] 
+	@ID uniqueidentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Delete DevTrkr..DevProjects
+	Where ID=@ID
+END
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/1/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[DeleteNotableApplications] 
+	@ID uniqueidentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Delete DevTrkr..NotableApplications
+	Where ID=@ID
+END
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/1/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[DeleteNotableFileTypes] 
+	@ID uniqueidentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Delete DevTrkr..NotableFileTypes
+	Where ID=@ID
+END
+GO
+
+Use DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/1/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[DeleteProjNameMatches] 
+	@ID uniqueidentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Delete DevTrkr..ProjNameMatches
+	Where ID=@ID
+END
+GO
+
+USE DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/14/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[InsertUpdateMeetings] 
+	@ID uniqueidentifier,
+	@Subject varchar (255),
+	@Organizer varchar (255),
+	@StartTime datetime,
+	@EndTime datetime,
+	@Recurring bit,
+	@UserName varchar (50),
+	@UserDisplayName varchar (50)
+	
+AS
+BEGIN
+	Set NOCOUNT OFF
+	If not exists(select 1 from DevTrkr..Meetings with (nolock) where ID = @ID)
+	Begin
+		Insert into DevTrkr..Meetings
+		(ID, Subject, Organizer, StartTime, EndTime, Recurring, UserName, UserDisplayName )
+		Values
+		(@ID, @Subject, @Organizer, @StartTime, @EndTime, @Recurring, @UserName, @UserDisplayName )
+	End
+	Else
+	Begin
+		Update DevTrkr..Meetings
+		Set Subject = @Subject, 
+		Organizer = @Organizer, 
+		StartTime = @StartTime, 
+		EndTime = @EndTime, 
+		Recurring = @Recurring, 
+		UserName = @UserName, 
+		UserDisplayName = @UserDisplayName
+		Where ID = @ID
+	End
+END
+GO
+
+USE DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: <Create Date,,>
+-- Updates project files which were written before the
+-- .xxproj file 
+-- when the .xxproj file is saved the FileAnalyzer 
+-- calls this sproc with a guaranteed ProjectName and Path
+-- for any filenames that contain the ProjectPath
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateFileActivityWithProjectData] 
+	@Machine varchar (255),
+	@DevProjName varchar (255),
+	@Filename varchar (255),
+	@Username varchar (50),
+	@DevProjectPath varchar (255)
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update FileActivity
+	Set DevProjName = @DevProjName,
+	@DevProjectPath = @DevProjectPath
+	Where Machine = @Machine
+	And Username = @Username
+	And Filename like '%' + @DevProjectPath + '%'
+	 
+END
+GO
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[GetDevProjectByName]    Script Date: 5/11/2020 12:16:42 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/11/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDevProjectByNameAndGitURL] 
+	@DevProjectName varchar (255),
+	@GitURL varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	Begin
+		Select *
+		From DevTrkr..DevProjects with (nolock)
+		Where DevProjectName = @DevProjectName
+		And GitURL = @GitURL
+	End
+END
+
+
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[GetDevProjectByName]    Script Date: 4/30/2020 9:48:23 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/27/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDevProjectByName] 
+	@DevProjectName varchar (255),
+	@DevProjectPath varchar(255),
+	@Machine varchar(255) = null,
+	@UserName varchar(255) = null	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+	If @UserName is null or @Machine is null or @DevProjectPath = ''
+	Begin
+		Select *
+		From DevTrkr..DevProjects with (nolock)
+		Where DevProjectName = @DevProjectName
+		Order by SyncID
+	End
+	Else
+	Begin
+		Select *
+		From DevTrkr..DevProjects with (nolock)
+		Where DevProjectName = @DevProjectName 
+		and DevProjectPath = @DevProjectPath
+		and Machine = @Machine
+		And UserName = @UserName
+		Order by SyncID
+	End
+END
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[GetDevProjectByName]    Script Date: 5/11/2020 12:16:42 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/11/2020
+-- Get all records by name so the app can query 
+-- what database knows about the projectname
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDevProjectsAndSyncByName] 
+	@DevProjectName varchar (255),
+	@GitURL varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+		Select *
+		From DevTrkr..DevProjects with (nolock)
+		Where DevProjectName = @DevProjectName
+		
+		Select * 
+		From Devtrkr..ProjectSync with (nolock)
+		Where DevProjectName = @DevProjectName
+END
+
+
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[InsertProjectSyncObject]    Script Date: 5/11/2020 11:49:40 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 4/27/2020
+-- =============================================
+ALTER PROCEDURE [dbo].[InsertProjectSyncObject] 
+	@ID uniqueidentifier,
+	@DevProjectName varchar (255),
+	@CreatedDate datetime,
+	@DevProjectCount int,
+	@GitURL uniqueidentifier null	
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Insert Into DevTrkr..ProjectSync
+	(ID, DevProjectName, CreatedDate, DevProjectCount, GitURL )
+	Values
+	(@ID, @DevProjectName, @CreatedDate, @DevProjectCount, @GitURL )
+
+END
+GO
+
+USE DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/3/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateSLNPathInDevProject] 
+	@ID uniqueidentifier,
+	@DevSLNPath varchar (255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    update DevTrkr..DevProjects
+	Set DevSLNPath = @DevSLNPath
+	where ID = @ID
+END
+GO
+
+
+
+
+--**** Table Population
+insert into DevTrkr..ProjNameMatches
+(ID, Regex, Unknownvalue, appname,  ProjNameReplaces, RegexGroupName)
+Values
+(newid(),'(?<PrjName>.*?)(?<spacer> - )*Microsoft Visual Studio|Microsoft Visual Studio',	'VSUnknown',	'devenv',	0,	'(Running)|(Debugging)',	'PrjName')
+
+insert into DevTrkr..ProjNameMatches
+(ID, Regex, Unknownvalue, appname,  ProjNameReplaces, RegexGroupName)
+Values
+(newid(),'^(?<FileName>.*?) - (?<PrjName>.*?) - Visual Studio Code|Welcome - Visual Studio Code|Open Folder',	'vscodeUnknown',	'Code',	1,	NULL, 'PrjName')
+
+
+--**** User Defined functions
+USE [DevTrkr]
+GO
+/****** Object:  UserDefinedFunction [dbo].[uf_StringSplit]    Script Date: 3/10/2020 9:34:26 AM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:          Les Smith
+-- Create date: 04-10-2015
+-- Description:     Parses out CSV,SemicolonSV, PipeSV from a
+--                         string into separate values
+-- =============================================
+CREATE FUNCTION [dbo].[udf_StringSplit]
+(
+    @String VarChar(max)
+)
+RETURNS @Outputs table (String varchar(max))
+AS
+BEGIN
+    Declare @Length int = (Select Len(@String))
+    Declare @StringStage Table (String varChar(max))
+    Declare @CharNumber int
+ 
+    Set @String = RTrim(Ltrim(@String))
+    Insert into @StringStage
+    Values (@String)
+    Update @StringStage set String = replace(String, ',','|')
+    Update @StringStage set String = replace(String, ';','|')
+    Set @String = (Select * from @StringStage)
+    Set @CharNumber = CharIndex('|',@String)
+
+    while @Length > 0
+		Begin
+		Set @CharNumber = CharIndex('|',@String)
+		If @CharNumber > 0
+		Begin
+				Insert into @Outputs
+				Select RTrim(LTrim(Left(@String, @CharNumber-1)))
+				Set @String = right(@string, (Len(@String)-@CharNumber))
+				Set @Length = (Select Len(@String))
+		End
+
+		If @CharNumber = 0
+		Begin
+				Insert into @Outputs
+				Select RTrim(LTrim(@String))
+				Set @String = ''
+				Set @length = (Select Len(@String))
+		End         
+		End
+
+    Delete from @Outputs
+    where String = ''
+ 
+    RETURN
+END
+GO
+

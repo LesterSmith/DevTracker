@@ -1,0 +1,75 @@
+﻿Multiple processes will run concurrently:
+
+1. The ActiveChangeWatcher records to database table DevTrkr..WindowEvents.  This tells us
+   what application is in use and how long it is in use.  This is especially interesting
+   when the app name is "denenv", or Microsoft Visual Studio, since the object of this app
+   is to capture the amount of time spent in actual development, i.e., coding and debugging.
+
+2. The FileWatcher process records files being written created, updated, etc. This along with
+   the window change events can tell us which application was running to produce the file.  
+   We are not only interexted in the file extension, that obviously would give an indication
+   of the app or type of app that created the file, but we are interested in the development
+   project in which the file is used.  That will allow us to accumulate time spent in other 
+   apps besides Visual Studio where the developer spent time on the project.
+
+3. Caculating sum of event times
+	--create @table Events
+	declare @Events Table
+	(
+		EventID int identity primary key,
+		StartDate datetime not null,
+		EndDate datetime not null
+	)
+
+	insert into @Events (StartDate, EndDate)
+	select '2007-01-01 6:34:12 AM', '2007-01-01 12:45:34 PM' union all
+	select '2007-01-02 9:23:08 AM', '2007-01-02 5:05:37 PM' union all
+	select '2007-01-03 4:34:12 PM', '2007-01-03 4:55:18 PM' union all
+	select '2007-01-04 11:02:00 AM', '2007-01-04 2:53:21 PM' union all
+	select '2007-01-05 7:52:55 AM', '2007-01-05 9:08:48 AM' union all
+	select '2007-01-06 7:59:11 PM', '2007-01-07 1:23:11 AM' union all
+	select '2007-01-07 3:12:23 AM', '2007-01-07 8:02:25 PM'
+
+	select 
+	  sum(TotalSeconds) / 3600 as Hours, 
+	  (sum(TotalSeconds) % 3600) / 60 as Minutes, 
+	  sum(TotalSeconds) % 60 as Seconds
+	from
+	(
+		select EventID, DateDiff(second, StartDate, EndDate) as TotalSeconds 
+		from @Events
+	) x
+
+	https://www.sqlteam.com/articles/working-with-time-spans-and-durations-in-sql-server
+
+	ISSUES:
+	1. Files that are not being saved to a DevProjectPath should not be recorded
+	   because they can't be charged to a dev project andd therefore aren't interesting.
+
+    2. Not picking up a window event when alt tabbing to the new window causing me to miss
+	   dev time...
+
+/* Advent of ProjectSync table
+*  One to many with DevProjects Table
+*  It has only a Row ID, DevProject Name, UniqueProjID CreatedDate and possibly ITProjectID (moved from DevProjects)
+*  Each unique DevProjectName from DevProjects will have one row in ProjectSync
+*  For each user working on a project in DevProjects, there will be a row in DevProjects with the same
+*  DevProjectName and one row in the ProjectSync table
+*  This new table will allow us to link all users working on the same project on different machines and
+*  at the same time allow us to separate a developer[s] working on a project with the same name but 
+*  unrelated to another project by the same name.  This is required because we don't attempt to control
+*  the naming of new projects by developers and we can't control them.  Any attempt would be seen as
+*  micro management and a roadblock to proress by most developers.  Non developers may not understand
+*  this, but Les Smith does.  For example, a developer creates a quick and dirty test project and 
+*  Visual Studio suggests the name 'ConsoleApplication1' by default.  DevTracker will log that new project
+*  in the DevProjects table (currently if it does not already exist, if it does, by another user, they
+*  both currently start tracking to the same project in database, which is wrong) 
+*  and will happen with every one that creates an unrelated project with the same name as others
+*  Maintenance will be automatic unless we find that we have unrelated projects with the same name.
+*  A new tab will be added to the Options Form to allow a Manager or Admin to separate these projectss
+*  by adding a new ProjectSync Table row with 
+* 
+*/
+   
+   
+   
