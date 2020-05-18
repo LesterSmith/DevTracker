@@ -383,10 +383,10 @@ namespace DevTracker.Classes
         /// </summary>
         public WindowEvents(/* blank constructor to process the queue */)
         {
+            WinEventProcesss wep;
             TopOfCode:
             try
             {
-                WinEventProcesss wep;
 
                 // get a queue item if it exists
                 while (true)
@@ -629,15 +629,14 @@ namespace DevTracker.Classes
                 int rows = hlpr.InsertWindowEvent(item);
 
 
-                const string comma = ",";
 #if DEBUG
+                const string comma = ",";
                 Debug.Write("******* " + title + comma +
                             _startTime.ToString("HH:mm:ss") + comma +
                             wep.MyWindowEvent.EndTime.ToString("HH:mm:ss") + comma +
                             wep.MyWindowEvent.AppName + comma +
                             wep.MyWindowEvent.ModuleName + comma +
                             devPrjName + Environment.NewLine);
-
 #endif
 
                 goto TopOfCode; // check for more queue entries
