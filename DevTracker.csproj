@@ -64,6 +64,7 @@
     <Compile Include="Classes\FileWatcher.cs" />
     <Compile Include="Classes\GetCurrentWindowCaption.cs" />
     <Compile Include="Classes\Globals.cs" />
+    <Compile Include="Classes\MaintainProject.cs" />
     <Compile Include="Classes\Startup.cs" />
     <Compile Include="Classes\WCTApplicationContext.cs" />
     <Compile Include="Classes\WindowChangeEvents.cs" />
@@ -154,10 +155,6 @@
     <ProjectReference Include="..\DevTrkr DLLs\DataHelpers\DataHelpers.csproj">
       <Project>{d9b4d5fa-6a12-4e45-9ae5-1a55a300ef1a}</Project>
       <Name>DataHelpers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DevTrkr DLLs\DevProjects\DevProjects.csproj">
-      <Project>{27f48f76-11be-4e53-a208-1081bcf546bf}</Project>
-      <Name>DevProjects</Name>
     </ProjectReference>
     <ProjectReference Include="..\DevTrkr DLLs\DevTrkrReports\DevTrkrReports.csproj">
       <Project>{23c9c59c-1ee6-47f3-b85e-da36deccf42e}</Project>

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using DataHelpers;
 using BusinessObjects;
-using DevProjects;
+//using DevProjects;
 
 namespace DevTracker.Classes
 {
@@ -383,11 +383,11 @@ namespace DevTracker.Classes
         /// </summary>
         public WindowEvents(/* blank constructor to process the queue */)
         {
+            TopOfCode:
             try
             {
                 WinEventProcesss wep;
 
-                TopOfCode:
                 // get a queue item if it exists
                 while (true)
                 {
@@ -646,6 +646,7 @@ namespace DevTracker.Classes
             {
                 Debug.Print(ex.Message);
             }
+            goto TopOfCode;
         }
 
         #endregion
