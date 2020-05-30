@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using BusinessObjects;
 using DevTracker;
-//using DevProjects;
+using DevProjects;
 using CodeCounter;
 using System.Diagnostics;
 using DataHelpers;
@@ -16,16 +16,16 @@ using DataHelpers;
 namespace DevTracker.Classes
 {
     /// <summary>
+    /// We are only interested in development associated file, not just general 
+    /// files.  Only files which are known to be dev files or in a dev project path
     /// determines if the file path matches a known project path and
     /// thereby denotes whether the file is of interest to us
-    /// if the currentapp is devenv we have a file being used by VS
+    /// if the currentapp is an IDE we have a file being used in development
     /// That being the case we can either use the path to find an existing project
     /// in the table of VS projects or record the new project
     /// </summary>
     public class FileAnalyzer
     {
-        //TODO: look for ..\projectname\.git\config (no ext) being saved
-        // the project is being inialized for gitHub
         #region ..ctor
         public FileAnalyzer()
         {
@@ -40,6 +40,8 @@ namespace DevTracker.Classes
                 // get a queue item
                 while (true)
                 {
+                    // this lock is local to this machine, and protects the Queue
+                    // b/c we are multithreaded and multiple cores (processing)
                     lock (Globals.SyncLockObject)
                     {
                         if (Globals.FileChangeQueue.Count.Equals(0))
@@ -55,17 +57,13 @@ namespace DevTracker.Classes
                 }
                 
 
-                // if a background windows process like VS is saving temp files, ignore it
-                if (fc.FullPath.ToLower().Contains($"\\users\\{Environment.UserName}\\"))
-                    goto TopOfCode;
-
                 //NOTE: the original reason for the FileWatcher is not to record files being manipulated,
                 // Rather it is to help maintain the DevProjects Table with the best information posssible
                 // so that the WindowEvents class can charge the project and to report back to the windowevents
                 // LastWindowEvent the project being worked on by the currentapp
 
                 var ext = Path.GetExtension(fc.FullPath).Replace(".", string.Empty).ToLower();
-                var isDevFile = false; // will be true if file is a development file
+                //var isDevFile = false; // will be true if file is a development file
                 var devPath = string.Empty;
                 var devProject = string.Empty;
                 var relativeFileName = string.Empty; // filename past the pathname
@@ -80,14 +78,13 @@ namespace DevTracker.Classes
                     && ideMatch.IsIde
                     && projFileObject != null
                     && !string.IsNullOrWhiteSpace(projFileObject.IDEProjectExtension)
-                    && projFileObject.IDEProjectExtension.Contains(ext))
+                    && projFileObject.IDEProjectExtension.Equals(ext))
                 {
                     // yes, we are manipulating a development language project file
                     // therefore the path is where the project file is saved and
                     // by definition, the filename is the name of the project
                     fc.ProjectName = Path.GetFileNameWithoutExtension(fc.FullPath);
                     devPath = Path.GetDirectoryName(fc.FullPath);
-                    isDevFile = true;
                     
                     // if devPath not in DevProjects path insert it, else update the pathname
                     mp.CheckForInsertingNewProjectPath(
@@ -98,7 +95,7 @@ namespace DevTracker.Classes
                         IDEAppName = fc.CurrentApp,
                         DatabaseProject = ideMatch.IsDBEngine,
                         CountLines = projFileObject.CountLines,
-                        ProjFileExt = projFileObject.Extension
+                        ProjFileExt = projFileObject.IDEProjectExtension
                     }, fc.FullPath);
 
                     // since project files (.cs,.vb, etc.) could be created before
@@ -117,14 +114,17 @@ namespace DevTracker.Classes
                     // from the FileWatcher and is processing files in sequence as they are queued
                     // by FileWatcher class
                     // **** PUT NEW UPDATE CODE NEXT TO REPLACE --THINK IT THRU ****
-                    UpdateFileActivityWithProjectNameAndPath(
-                        new FileActivity
-                        {
-                            DevProjName = fc.ProjectName,
-                            DevProjectPath = devPath,
-                            Machine = Environment.MachineName,
-                            Username = Environment.UserName
-                        });
+                    //TODO: below code is not used any more but we need code to update 
+                    // ProjectFiles table but put that code in MaintainProjects Class
+                    // it knows the logic of updating the tables
+                    //UpdateFileActivityWithProjectNameAndPath(
+                    //    new FileActivity
+                    //    {
+                    //        DevProjName = fc.ProjectName,
+                    //        DevProjectPath = devPath,
+                    //        Machine = Environment.MachineName,
+                    //        Username = Environment.UserName
+                    //    });
                 }
                 else if (ideMatch != null
                             && ideMatch.IsIde
@@ -138,75 +138,107 @@ namespace DevTracker.Classes
                     // project file in the path somewhere
 
                     // NOTE: changing logic here to something more reliable 04/17/2020
-                    DevProjPath pp = IsFileInADevProjectPath(fc.FullPath);
+                    DevProjPath pp = mp.IsFileInADevProjectPath(fc.FullPath);
                     // if pp not null, we have a known project
                     if (pp != null)
                     {
                         fc.ProjectName = pp.DevProjectName;
                         devPath = pp.DevProjectPath;
-                        isDevFile = true;
+                        mp.CheckForInsertingNewProjectPath(new DevProjPath 
+                        { 
+                            DevProjectName = fc.ProjectName, 
+                            DevProjectPath = devPath, 
+                            IDEAppName = fc.CurrentApp, 
+                            DatabaseProject = ideMatch.IsDBEngine, 
+                            CountLines = projFileObject.CountLines, 
+                            ProjFileExt = projFileObject.IDEProjectExtension}, 
+                            fc.FullPath);
                     }
                     else
                     {
                         // NOTE: if GetProjectPath returns project name and path it
                         // found the .xxproj file so we are sure that we can check for inserting
                         // a new project in DevProjects table
-                        var projectName = string.Empty;
-                        devPath = GetProjectPath(fc.FullPath, out projectName, projFileObject.IDEProjectExtension);
-                        if (!string.IsNullOrWhiteSpace(projectName))
-                            fc.ProjectName = projectName;
-
-                        if (string.IsNullOrWhiteSpace(fc.ProjectName) || string.IsNullOrWhiteSpace(devPath))
+                        Tuple<string, string, string> tuple = mp.GetProjectFromDevFileSave(fc.FullPath, Globals.NotableFiles, ext);
+                        if (tuple == null)
+                        {
                             Debug.WriteLine($"Missing Data, Project: {fc.ProjectName}  Path: {devPath}");
+                            goto TopOfCode;
+                        }
                         else
                         {
-                            //NOTE: Moved to new class with SyncID
+                            fc.ProjectName = tuple.Item1;
+                            devPath = tuple.Item2;
                             mp.CheckForInsertingNewProjectPath(
                             new DevProjPath
                             {
-                                DevProjectName = fc.ProjectName,
-                                DevProjectPath = devPath,
+                                DevProjectName = tuple.Item1,
+                                DevProjectPath = tuple.Item2,
                                 IDEAppName = fc.CurrentApp,
                                 DatabaseProject = ideMatch.IsDBEngine,
                                 CountLines = projFileObject.CountLines,
-                                ProjFileExt = projFileObject.Extension
+                                ProjFileExt = projFileObject.IDEProjectExtension
                             }, fc.FullPath);
-                            isDevFile = true;
                         }
                     }
                 }
+                else if (fc.FullPath.ToLower().EndsWith(@"\.git\config"))
+                {
+                    // we can try to get the project file name from git config file
+                    // the config file will not get a URL until the local repo is pushed to the server
+                    var url = mp.GetGitURLFromConfigFile(fc.FullPath);
+                    if (string.IsNullOrWhiteSpace(url))
+                        goto TopOfCode;
+
+                    // get the repo name from the url, should be a projectname, may not be
+                    var m = Regex.Match(url, @".*/(?<PrjName>.*?)\.git");
+                    var trialProjName = 
+                        m.Success && !string.IsNullOrWhiteSpace(m.Groups["PrjName"].Value) 
+                        ? m.Groups["PrjName"].Value 
+                        : string.Empty;
+                    // if the url does not contain a projectname quit
+                    if (string.IsNullOrWhiteSpace(trialProjName)) goto TopOfCode;
+                    
+                    var exten = Globals.NotableFiles.Find(x => x.Extension == "config");
+                    if (exten == null) goto TopOfCode;
+                    Tuple<string, string, string> projObj = mp.GetProjectFromGitConfigSaved(fc.FullPath, Globals.NotableFiles);
+                    if (projObj == null) goto TopOfCode;
+                    fc.ProjectName = projObj.Item1;
+                    devPath = projObj.Item2;
+
+                    mp.CheckForInsertingNewProjectPath(
+                        new DevProjPath
+                        {
+                            DevProjectName = projObj.Item1,
+                            DevProjectPath = projObj.Item2,
+                            IDEAppName = fc.CurrentApp,
+                            DatabaseProject = false, // above code found vs project extension
+                            CountLines = true,
+                            ProjFileExt = projObj.Item3
+                        }, fc.FullPath);
+                    
+                }
                 else
                 {
-                    //NOTE: it just occurred to me that if Explorer is copying a development folder
-                    // to a new location, we are in fact creating a new project with the same
-                    // name in a different location, or if whoever runs for source
-                    // control to pull down a copy of an existing to this machine, we are
-                    // creating a new project with the same name but for the first time on this
-                    // computer, so we have to watch for the .xxproj file to hit this computer
-                    // and at that time the project is no different than if it were saved by
-                    // and IDE, as above, so it may be that we don't really care who saved the
-                    // project .xxproj or any other project type file cs, vb, cpp, fs, ect.
-                    // therefore the complex code above regarding an IDE is overkill and reall
-                    // should be more concerned with the type of file being saved than we are of
-                    // what application saved the file
-
                     // current app is not an IDE, or we don't have a projectFileExt type, 
                     // so see if file is saved in
                     // a known current devprojectpath for this machine and user
-                    DevProjPath pp = IsFileInADevProjectPath(fc.FullPath);
+                    DevProjPath pp = mp.IsFileInADevProjectPath(fc.FullPath);
                     if (pp == null)
                         goto TopOfCode;
 
                     // yes, this file is project file of a known DevProjects project
                     fc.ProjectName = pp.DevProjectName;
                     devPath = pp.DevProjectPath;
-                    isDevFile = true;
+
+                    mp.UpdateProjectFiles(pp, fc.FullPath, new DHMisc());
                 }
 
-                // NOTE: it looks like that if we get here we have a file that is being updated
-                // in a know development path, else we would have ignored the file before gettin here
+                // NOTE: if we get here we have a file that is being updated
+                // in a known development path, else we would have ignored the file before getting here
                 // if devProject is not empty, update the windowevent so that the app that caused this
                 // FW event can be charged to the project 
+                //NOTE: **** if not running window events, skip this code
                 if (!string.IsNullOrWhiteSpace(devPath))
                 {
                     lock (Globals.LastWindowEvent)
@@ -237,21 +269,24 @@ namespace DevTracker.Classes
                     }
                 }
 
+                #region obsolete code, commented out
+                // TODO: this code appears to be obsolete b/c we dont save fileActivity table anymore
+                // now, we only save data about development files
                 // chk to see if we want to save the file
-                switch (Globals.FilesToSave)
-                {
-                    case FileSaveOption.None:
-                        goto TopOfCode;
-                    case FileSaveOption.All:
-                        break;
-                    case FileSaveOption.Selected:
-                        if (!IsFileInteresting(fc.FullPath))
-                            goto TopOfCode;
-                        // not interested in binary fills unless part of a devproject
-                        if ((ext.Equals("dll") || ext.Equals("exe")) && !isDevFile)
-                            goto TopOfCode;
-                        break;
-                }
+                //switch (Globals.FilesToSave)
+                //{
+                //    case FileSaveOption.None:
+                //        goto TopOfCode;
+                //    case FileSaveOption.All:
+                //        break;
+                //    case FileSaveOption.Selected:
+                //        if (!IsFileInteresting(fc.FullPath))
+                //            goto TopOfCode;
+                //        // not interested in binary fills unless part of a devproject
+                //        if ((ext.Equals("dll") || ext.Equals("exe")) && !isDevFile)
+                //            goto TopOfCode;
+                //        break;
+                //}
 
                 // Now, if the file is a dev file and we are to count lines
                 //int codeLines = 0;
@@ -271,27 +306,28 @@ namespace DevTracker.Classes
                 //}
 
                 // TODO: file should be recorded in ProjectFiles table not fileActivity
-                var fa = new FileActivity
-                {
-                    Machine = Environment.MachineName,
-                    DevProjName = fc.ProjectName,
-                    Filename = fc.FullPath,
-                    Username = Environment.UserName,
-                    FileLength = new FileInfo(fc.FullPath).Length,
-                    LastAction = fc.ChangeType,
-                    CreatedBy = Environment.UserName,
-                    UpdatedBy = Environment.UserName,
-                    LastUpdate = DateTime.Now,
-                    DevProjectPath = devPath,
-                    UpdateCount = 1,
-                    //CodeLines = codeLines,
-                    //CommentLines = commentLines,
-                    //BlankLines = blankLines,
-                    //DesignerLines = designerLines
-                };
+                //var fa = new FileActivity
+                //{
+                //    Machine = Environment.MachineName,
+                //    DevProjName = fc.ProjectName,
+                //    Filename = fc.FullPath,
+                //    Username = Environment.UserName,
+                //    FileLength = new FileInfo(fc.FullPath).Length,
+                //    LastAction = fc.ChangeType,
+                //    CreatedBy = Environment.UserName,
+                //    UpdatedBy = Environment.UserName,
+                //    LastUpdate = DateTime.Now,
+                //    DevProjectPath = devPath,
+                //    UpdateCount = 1,
+                //    //CodeLines = codeLines,
+                //    //CommentLines = commentLines,
+                //    //BlankLines = blankLines,
+                //    //DesignerLines = designerLines
+                //};
 
-                var hlpr = new DHFileWatcher();
-                var rows = hlpr.InsertUpdateFileActivity(fa);
+                //var hlpr = new DHFileWatcher();
+                //var rows = hlpr.InsertUpdateFileActivity(fa); 
+                #endregion
                 goto TopOfCode;
             }
             catch (Exception ex)
@@ -328,135 +364,91 @@ namespace DevTracker.Classes
         ///    insert/update the file activity table if the file is in 
         ///    a known project path
         /// </summary>
-        private void CheckForInsertingNewProjectPath(DevProjPath projPath)
-        {
-            var hlpr = new DataHelpers.DHFileWatcher();
-            var rows = hlpr.CheckForInsertingNewProjectPath(projPath);
-        }
-
-        private DevProjPath IsFileInADevProjectPath(string fullPath)
-        {
-            var hlpr = new DataHelpers.DHFileWatcher();
-            return hlpr.IsFileInDevPrjPath(fullPath);
-        }
-
-        private bool IsFileInteresting(string fileName)
-        {
-            try
-            {
-                var ext = Path.GetExtension(fileName).ToLower().Substring(1);
-                if (string.IsNullOrWhiteSpace(ext))
-                {
-                    return false;
-                }
-                var o = Globals.NotableFiles.Find(x => x.Extension == ext);
-                return o != null;
-            }
-            catch (Exception)
-            {
-                //no write access, other app not done
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// "C:\VS2019 Projects\DataLayerUtility\DataLayerUtility\Forms\frmMain.cs"
-        /// the obvious fallacy here is that the path could be 
-        /// c:\VS2019 Projects\Web Projects\MyWebApp1 Sln Folder\MyWebApp1\Web Pages\Web Page1.aspx
-        /// and this method will return "c:\VS2019 Projects\Web Projects" as the ProjectPath
-        /// </summary>
-        /// <param name="fileName"></param>
-        /// <returns></returns>
-        //public string GetProjectPath(string fileName, bool isIDE)
+        //private void CheckForInsertingNewProjectPath(DevProjPath projPath)
         //{
-        //    const string slash = @"\";
-
-        //    var idxLast = FullPath.LastIndexOf(slash);
-        //    var fullPath = FullPath;
-
-        //    // strip the filename and last slash if extant
-        //    if (fullPath.Length > idxLast + 1)
-        //        fullPath = fullPath.Substring(0, idxLast);
-
-        //    if (!isIDE /*CurrentApp != "devenv" && CurrentApp != "Code"*/)
-        //    {
-        //        return string.Empty;
-        //    }
-        //    /* Debug only stop filewatcher so we can debug */
-        //    //Globals.FileWatchr.fileWatcher1.EnableRaisingEvents = false;
-        //    /* take out line above for runnint */
-
-        //    // now we have the fullPath like 
-        //    //C:\VS2019 Projects\DataLayerUtility\DataLayerUtility\Forms
-        //    // since this is an ide, strip all paths from the end != ProjectPath
-        //    var name = string.Empty;
-        //    while (true)
-        //    {
-        //        idxLast = fullPath.LastIndexOf(slash);
-        //        if (idxLast < 0)
-        //            break;
-        //        name = fullPath.Substring(idxLast + 1);
-        //        if (name.ToLower() == ProjectName.ToLower())
-        //            return fullPath;
-        //        fullPath = fullPath.Substring(0, idxLast);
-        //    }
-        //    return fullPath;
+        //    var hlpr = new DataHelpers.DHFileWatcher();
+        //    var rows = hlpr.CheckForInsertingNewProjectPath(projPath);
         //}
 
+        //private DevProjPath IsFileInADevProjectPath(string fullPath)
+        //{
+        //    var hlpr = new DataHelpers.DHFileWatcher();
+        //    return hlpr.IsFileInDevPrjPath(fullPath);
+        //}
+
+        //private bool IsFileInteresting(string fileName)
+        //{
+        //    try
+        //    {
+        //        var ext = Path.GetExtension(fileName).ToLower().Substring(1);
+        //        if (string.IsNullOrWhiteSpace(ext))
+        //        {
+        //            return false;
+        //        }
+        //        var o = Globals.NotableFiles.Find(x => x.Extension == ext);
+        //        return o != null;
+        //    }
+        //    catch (Exception)
+        //    {
+        //        //no write access, other app not done
+        //        return false;
+        //    }
+        //}
         /// <summary>
         /// TODO: this must be tested
         /// This method attempts to get the project path by looking for 
         /// </summary>
         /// <param name="out projectName"></param>
         /// <param name="projFileExt"></param>
-        /// <returns></returns>
-        private string GetProjectPath(string fileFullPath, out string projectName, string projFileExt)
-        {
-            if (string.IsNullOrWhiteSpace(Path.GetFileName(fileFullPath)))
-            {
-                projectName = string.Empty;
-                return string.Empty;
-            }
+        /// <returns>Tuple(projName, projPath)</returns>
+        //private Tuple<string, string> GetProjectPath(string fileFullPath, string projFileExt)
+        //{
+        //    if (string.IsNullOrWhiteSpace(Path.GetFileName(fileFullPath)))
+        //    {
+        //        return null;
+        //    }
 
-            var fullPath = fileFullPath;
-            var dirName = string.Empty;
+        //    var fullPath = fileFullPath;
+        //    var dirName = string.Empty;
 
-            while (!string.IsNullOrWhiteSpace(fullPath))
-            {
-                fullPath = Path.GetDirectoryName(fullPath);
-                if (string.IsNullOrWhiteSpace(fullPath))
-                {
-                    projectName = string.Empty;
-                    return string.Empty;
-                }
+        //    while (!string.IsNullOrWhiteSpace(fullPath))
+        //    {
+        //        fullPath = Path.GetDirectoryName(fullPath);
+        //        if (string.IsNullOrWhiteSpace(fullPath))
+        //        {
+        //            return null;
+        //            //projectName = string.Empty;
+        //            //return string.Empty;
+        //        }
 
-                dirName = new DirectoryInfo(fullPath).Name;
-                var prj = Globals.ProjectList.Find(x => x.DevProjectName.ToLower() == dirName.ToLower());
+        //        dirName = new DirectoryInfo(fullPath).Name;
+        //        var prj = Globals.ProjectList.Find(x => x.DevProjectName.ToLower() == dirName.ToLower());
 
-                // we think we have a project path
-                if (prj != null)
-                {
-                    projectName = dirName;
-                    // we think we have a project path, chek for a xxproj file in the path
-                    // projFileExt can have multiple delimited extensions
-                    // mainly b/c c++ proj extension changed in later version
-                    string[] extensions = projFileExt.Split('|');
-                    for (int i = 0; i < extensions.Length; i++)
-                    {
-                        var projFile = projectName + "." + extensions[i];
-                        if (File.Exists(Path.Combine(fullPath, projFile)))
-                        {
-                            projectName = dirName;
-                            return fullPath;
-                        }
-                    }
-                    continue;
-                }
-            }
-
-            projectName = string.Empty;
-            return string.Empty; // did not find a project file in the supposed project directory
-        }
+        //        // we think we have a project path
+        //        if (prj != null)
+        //        {
+        //            var projectName = dirName;
+        //            // we think we have a project path, chek for a xxproj file in the path
+        //            // projFileExt can have multiple delimited extensions
+        //            // mainly b/c c++ proj extension changed in later version
+        //            string[] extensions = projFileExt.Split('|');
+        //            for (int i = 0; i < extensions.Length; i++)
+        //            {
+        //                var projFile = projectName + "." + extensions[i];
+        //                if (File.Exists(Path.Combine(fullPath, projFile)))
+        //                {
+        //                    return Tuple.Create<string, string>(dirName, fullPath);
+        //                    //projectName = dirName;
+        //                    //return fullPath;
+        //                }
+        //            }
+        //            continue;
+        //        }
+        //    }
+        //    return null;
+        //    //projectName = string.Empty;
+        //    //return string.Empty; // did not find a project file in the supposed project directory
+        //}
 
         #endregion
     }

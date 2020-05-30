@@ -21,6 +21,8 @@ Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HHIImage", "..\HHIImage\HHI
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeCounter", "..\DevTrkr DLLs\CodeCounter\CodeCounter.csproj", "{553318DB-4F95-48AA-B004-B53912FD868F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevProjects", "..\DevTrkr DLLs\DevProjects\DevProjects.csproj", "{27F48F76-11BE-4E53-A208-1081BCF546BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -101,6 +103,14 @@ Global
 		{553318DB-4F95-48AA-B004-B53912FD868F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{553318DB-4F95-48AA-B004-B53912FD868F}.Release|x86.ActiveCfg = Release|Any CPU
 		{553318DB-4F95-48AA-B004-B53912FD868F}.Release|x86.Build.0 = Release|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Debug|x86.Build.0 = Debug|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Release|x86.ActiveCfg = Release|Any CPU
+		{27F48F76-11BE-4E53-A208-1081BCF546BF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

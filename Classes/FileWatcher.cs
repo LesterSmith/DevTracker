@@ -1,5 +1,4 @@
-﻿#define QUEUEING
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,10 +11,10 @@ namespace DevTracker.Classes
 {
     public enum FWType
     {
-        Created =0,
-        Changed=1,
-        Deleted=2,
-        Renamed=3
+        Created = 0,
+        Changed = 1,
+        Deleted = 2,
+        Renamed = 3
     }
 
     public class FileWatcher : IDisposable
@@ -81,63 +80,20 @@ namespace DevTracker.Classes
         #endregion
 
         #region events
-        //private void fileSystemWatcher1_Changed(object sender, FileSystemEventArgs e)
-        //{
-        //    if (!File.Exists(e.FullPath) || !IsFileInteresting(e.FullPath)) return;
-
-        //    var fa = GetAnalyzer(e);
-        //    fa.StartProcessing();
-        //}
-
-        //private void fileSystemWatcher1_Created(object sender, FileSystemEventArgs e)
-        //{
-        //    if (!File.Exists(e.FullPath) || !IsFileInteresting(e.FullPath)) return;
-
-        //    var fa = GetAnalyzer(e);
-        //    fa.StartProcessing();
-        //}
-
-        //private void fileSystemWatcher1_Deleted(object sender, FileSystemEventArgs e)
-        //{
-        //    if (!File.Exists(e.FullPath) || !IsFileInteresting(e.FullPath)) return;
-
-        //    var fa = GetAnalyzer(e);
-        //    fa.StartProcessing();
-        //}
-
-        //private void fileSystemWatcher1_Renamed(object sender, RenamedEventArgs e)
-        //{
-        //    if (!File.Exists(e.FullPath) || !IsFileInteresting(e.FullPath)) return;
-
-        //    var fa = GetAnalyzer((FileSystemEventArgs)e);
-        //    fa.StartProcessing();
-        //}
-
-
-
-        // Define the event handlers.
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             if (!File.Exists(e.FullPath) || !IsFileInteresting(e.FullPath)) return;
-#if !QUEUEING
-            var fa = GetAnalyzer(e);
-            fa.StartProcessing();
-#else
+
             var fc = GetFileChangeObject(e);
             QueueFileChangeForProcessing(fc);
-#endif
         }
 
         private void OnRenamed(object source, RenamedEventArgs e)
         {
             if (!File.Exists(e.FullPath) || !IsFileInteresting(e.FullPath)) return;
-#if !QUEUEING
-            var fa = GetAnalyzer((FileSystemEventArgs)e);
-            fa.StartProcessing();
-#else
+
             var fc = GetFileChangeObject(e);
             QueueFileChangeForProcessing(fc);
-#endif
         }
         #endregion
 
@@ -176,11 +132,10 @@ namespace DevTracker.Classes
             watcher.Path = watch_folder;
             /* Watch for changes in LastAccess and LastWrite times, and
                the renaming of files or directories. */
-               //TODO If a developer renames a folder within a project path we will have a problem charging
-               //     the project with apps working on project files....
+            //TODO If a developer renames a folder within a project path we will have a problem charging
+            //     the project with apps working on project files....
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-            // Only watch text files.
             watcher.Filter = "*.*";
             watcher.IncludeSubdirectories = true;
 
@@ -193,21 +148,6 @@ namespace DevTracker.Classes
             // Begin watching.
             watcher.EnableRaisingEvents = true;
         }
-
-        //private FileAnalyzer GetAnalyzer(FileSystemEventArgs e)
-        //{
-        //    FileAnalyzer fa = new FileAnalyzer
-        //    {
-        //        FullPath = e.FullPath,
-        //        CurrentApp = Globals.LastWindowEvent.AppName,
-        //        ChangeType = GetChangeType(e.ChangeType),
-        //        ProjectName = Globals.LastWindowEvent.DevProjectName,
-        //        WindowStartTime = Globals.LastWindowEvent.StartTime,
-        //        CurrentWindowID = Globals.LastWindowEvent.ID
-        //    };
-        //    return fa;
-        //}
-
         private FileChange GetFileChangeObject(FileSystemEventArgs e)
         {
             return new FileChange
@@ -220,23 +160,6 @@ namespace DevTracker.Classes
                 CurrentWindowID = Globals.LastWindowEvent.ID
             };
         }
-
-#if !QUEUEING
-        private FileAnalyzer GetAnalyzer(RenamedEventArgs e)
-        {
-            FileAnalyzer fa = new FileAnalyzer
-            {
-                FullPath = e.FullPath,
-                CurrentApp = Globals.LastWindowEvent.AppName,
-                ChangeType = GetChangeType(e.ChangeType),
-                ProjectName = Globals.LastWindowEvent.DevProjectName,
-                WindowStartTime = Globals.LastWindowEvent.StartTime,
-                CurrentWindowID = Globals.LastWindowEvent.ID
-
-            };
-            return fa;
-        }
-#endif
 
         private string GetChangeType(WatcherChangeTypes ct)
         {
@@ -258,11 +181,19 @@ namespace DevTracker.Classes
         {
             try
             {
+                // if a background windows process like VS is saving temp files, ignore it
+                if (fileName.ToLower().Contains($"\\users\\{Environment.UserName}\\"))
+                    return false;
+
                 var ext = Path.GetExtension(fileName);
                 if (!string.IsNullOrWhiteSpace(ext))
                     ext = ext.ToLower().Substring(1);
                 else
-                    return false; // file with no extension is not interesting
+                {
+                    // we are interested in the git config file for it contains URL
+                    if (fileName.ToLower().EndsWith(@"\.git\config"))
+                        return true;
+                }
                 var o = Globals.NotableFiles.Find(x => x.Extension == ext);
                 return o != null;
             }
@@ -279,9 +210,7 @@ namespace DevTracker.Classes
             {
                 _watchers[i].EnableRaisingEvents = false;
             }
-            //fileWatcher1.EnableRaisingEvents = false;
         }
-
-#endregion
+        #endregion
     }
 }

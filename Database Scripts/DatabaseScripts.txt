@@ -526,7 +526,7 @@ GO
 -- Author:		Les Smith
 -- Create date: 5/13/2020
 -- =============================================
-ALTER PROCEDURE [dbo].[InsertUpdateProjectFiles] 
+CREATE PROCEDURE [dbo].[InsertUpdateProjectFiles] 
 	@DevProjectName varchar (255),
 	@RelativeFileName varchar (50),
 	@SyncID uniqueidentifier,
@@ -555,7 +555,7 @@ BEGIN
 		Insert into DevTrkr..ProjectFiles
 		(ID, DevProjectName, RelativeFileName, SyncID, GitURL, CodeLines, CommentLines, BlankLines, DesignerLines, UpdateCount, CreatedDate, CreatedBy, LastUpdate, LastUpdatedBy )
 		Values
-		(newid(), @DevProjectName, @RelativeFileName, @SyncID, @GitURL, @CodeLines, @CommentLines, @BlankLines, @DesignerLines, 1, @CurrTime, @CreatedBy, null, @LastUpdatedBy )
+		(newid(), @DevProjectName, @RelativeFileName, @SyncID, @GitURL, @CodeLines, @CommentLines, @BlankLines, @DesignerLines, 1, @CurrTime, @CreatedBy, @CurrTime, @LastUpdatedBy )
 	End
 	Else
 	Begin
@@ -718,11 +718,34 @@ BEGIN
 END
 GO
 
+USE DevTrkr
+go
 
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/29/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[DeleteDuplicateProjectFile] 
+	@ID UniqueIdentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
 
-Use DevTrkr
+    Delete DevTrkr..ProjectFiles
+	Where ID = @ID
+END
 GO
 
+
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[InsertUpdateProjectSync]    Script Date: 5/19/2020 1:29:05 PM ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -732,7 +755,7 @@ GO
 -- Create date: 5/14/2020
 -- plan is to insert only when we have a gitURL to trigger it
 -- =============================================
-CREATE PROCEDURE [dbo].[InsertUpdateProjectSync] 
+ALTER PROCEDURE [dbo].[InsertUpdateProjectSync] 
 	@ID uniqueidentifier,
 	@DevProjectName varchar (255),
 	@CreatedDate datetime,
@@ -757,9 +780,10 @@ BEGIN
 	Begin
 		Update DevTrkr..ProjectSync
 		Set DevProjectCount = DevProjectCount + 1
+		where DevProjectName = @DevProjectName
+		And GitURL = @GitURL
 	End
 END
-GO
 
 
 USE [DevTrkr]
@@ -1207,6 +1231,61 @@ BEGIN
 END
 
 GO
+USE DevTrkr
+go
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/29/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateProjectFilesWithGitURL]
+	@GitURL varchar(255),
+	@DevProjectName varchar(255),
+	@SyncID UniqueIdentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update DevTrkr..ProjectFiles
+	Set GitURL = @GitURL
+	Where DevProjectName = @DevProjectName
+	And SyncID = @SyncID
+END
+GO
+
+
+
+Use DevTrkr
+go
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/29/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateProjectSyncWithGitURL] 
+	@ID UniqueIdentifier,
+	@GitURL varchar(255)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update DevTrkr..ProjectSync
+	Set GitURL = @GitURL
+	Where ID = @ID
+END
+GO
 
 
 USE [DevTrkr]
@@ -1220,7 +1299,7 @@ GO
 -- Author:		Les Smith
 -- Create date: 1/8/2020
 -- =============================================
-ALTER PROCEDURE [dbo].[UpdateUnknownProjectNameForIDEMatch] 
+CREATE PROCEDURE [dbo].[UpdateUnknownProjectNameForIDEMatch] 
 	@DevProjectName varchar(255),
 	@AppName varchar(50),
 	@UnknownKey varchar(50),
@@ -1587,6 +1666,36 @@ BEGIN
 END
 GO
 
+USE DevTrkr
+go
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 5/29/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetDuplicateProjectFiles] 
+	@DevProjectName varchar(255),
+	@SyncID UniqueIdentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select *
+	From DevTrkr..ProjectFiles with (nolock)
+	Where DevProjectName = @DevProjectName
+	And SyncID = @SyncID
+	Order by RelativeFileName, LastUpdate desc
+END
+GO
+
+
+
 Use DevTrkr
 GO
 
@@ -1762,6 +1871,37 @@ SET QUOTED_IDENTIFIER ON
 GO
 -- =============================================
 -- Author:		Les Smith
+-- Create date: 5/21/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[UpdateWindowEventsWithSyncID] 
+	@DevProjectName varchar(255),
+	@AppName varchar(50),
+	@SyncID UniqueIdentifier
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT Off;
+
+    Update DevTrkr..WindowEvents
+	Set SyncID = @SyncID
+	Where AppName= @AppName
+	And DevProjectName= @DevProjectName
+	And SyncID is null
+END
+GO
+
+
+
+USE DevTrkr
+GO
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
 -- Create date: <Create Date,,>
 -- Updates project files which were written before the
 -- .xxproj file 
@@ -1877,8 +2017,7 @@ GO
 -- what database knows about the projectname
 -- =============================================
 CREATE PROCEDURE [dbo].[GetDevProjectsAndSyncByName] 
-	@DevProjectName varchar (255),
-	@GitURL varchar (255)
+	@DevProjectName varchar (255)
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
