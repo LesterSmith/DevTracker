@@ -359,7 +359,10 @@ namespace DevTracker.Forms
             // the following call is not finding the projectname
             Console.WriteLine($"Call cfp.GetProjectNam, title={Globals.LastWindowEvent.WindowTitle}, appname={Globals.LastWindowEvent.AppName}");
 #endif           
-            var devProjectName = cfp.GetProjectName(Globals.LastWindowEvent.WindowTitle, ref accessDenied, Globals.LastWindowEvent.AppName, out ideMatchObject, ref writeDB);
+            Tuple<string, IDEMatch, bool> cfpObject = cfp.GetProjectName(Globals.LastWindowEvent.WindowTitle, accessDenied, Globals.LastWindowEvent.AppName, writeDB);
+            string devProjectName = cfpObject.Item1;
+            ideMatchObject = cfpObject.Item2;
+            writeDB = cfpObject.Item3;
 #if DEBUG
             var id = ideMatchObject != null ? ideMatchObject.ID.ToString() : string.Empty;
             Console.WriteLine($"devProjectName={devProjectName}, writeDB={writeDB}, MatchObject = {id}, LastWinEv.DevPrjName={Globals.LastWindowEvent.DevProjectName}");

@@ -36,9 +36,13 @@ namespace DevTracker.Classes
         public static List<IDEMatch> IDEMatches { get; set; }
         public static List<NotableApplication> NotableApplications { get; set; }
         public static List<NotableFileExtension> NotableFiles { get; set; }
-        public static FileSaveOption FilesToSave{get;set;}
+        // Since we now save only development files to ProjectFiles Table,
+        // the FileSaveOption had to do with FileActivity Table which is no longer used
+        // So the FilesToSave property is no longer needed
+        //public static FileSaveOption FilesToSave{get;set;}
         public static int CacheTimeout { get; set; }
-        public static List<DevProjPath> ProjectList { get; set; }
+        //NOTE: no longer cached, could grow too large && two much unneeded data
+        //public static List<DevProjPath> ProjectList { get; set; }
         public static string DisplayName { get; set; }
         //*********** End of Cached Objects ****************************
 

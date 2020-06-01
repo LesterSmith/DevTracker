@@ -1,12 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Threading;
-using System.Diagnostics;
-using System.Windows.Forms;
-using System.IO;
 using DataHelpers;
 using BusinessObjects;
 using System.DirectoryServices.AccountManagement;
@@ -58,15 +52,20 @@ namespace DevTracker.Classes
                 Globals.IDEMatches = hlpr.GetProjectNameMatches();
                 Globals.NotableApplications = hlpr.GetNotableApplications();
                 Globals.ConfigOptions = hlpr.GetConfigOptions();
-                Globals.ProjectList = hlpr.GetDevProjects(Environment.UserName, Environment.MachineName);
+                //NOTE: ProjectList will grow so large not feasible to maintain in cache
+                // Also, only used on occassion, so removing 6/2/2020
+                //Globals.ProjectList = hlpr.GetDevProjects(Environment.UserName, Environment.MachineName);
 
-                var fso = Globals.ConfigOptions.Find(o => o.Name == "RECORDFILES");
-                if (fso != null)
-                    Globals.FilesToSave =
-                        fso.Value.Equals("A") ? FileSaveOption.All
-                        : fso.Value.Equals("N") ? FileSaveOption.None
-                        : fso.Value.Equals("S") ? FileSaveOption.Selected
-                        : FileSaveOption.None;
+                // following code is obsolete since we save only develpment files and 
+                // we no longer need this FilesToSave property
+                //var fso = Globals.ConfigOptions.Find(o => o.Name == "RECORDFILES");
+                //if (fso != null)
+                //    Globals.FilesToSave =
+                //        fso.Value.Equals("A") ? FileSaveOption.All
+                //        : fso.Value.Equals("N") ? FileSaveOption.None
+                //        : fso.Value.Equals("S") ? FileSaveOption.Selected
+                //        : FileSaveOption.None;
+
                 var ce = Globals.ConfigOptions.Find(o => o.Name == "CACHEEXPIRATIONTIME");
                 Globals.CacheTimeout = ce != null ? int.Parse(ce.Value) : 15;
 

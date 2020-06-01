@@ -269,7 +269,7 @@ namespace DevTracker.Classes
                     }
                 }
 
-                #region obsolete code, commented out
+                #region obsolete code, commented out, was recording to FileActivity file
                 // TODO: this code appears to be obsolete b/c we dont save fileActivity table anymore
                 // now, we only save data about development files
                 // chk to see if we want to save the file
@@ -337,22 +337,20 @@ namespace DevTracker.Classes
             }
         }
 
+        #endregion
+
+
+        #region private methods all obsolete
         /// <summary>
         /// This method updates the projectname
         /// </summary>
         /// <param name="fileActivity"></param>
         /// <returns></returns>
-        private int UpdateFileActivityWithProjectNameAndPath(FileActivity fileActivity)
-        {
-            var hlpr = new DHMisc();
-            return hlpr.UpdateFileActivityWithProjectData(fileActivity);
-        }
-        #endregion
-
-        #region public methods
-        #endregion
-
-        #region private methods
+        //private int UpdateFileActivityWithProjectNameAndPath(FileActivity fileActivity)
+        //{
+        //    var hlpr = new DHMisc();
+        //    return hlpr.UpdateFileActivityWithProjectData(fileActivity);
+        //}
         /// <summary>
         /// Two things to do here
         /// 1) if this file is being saved by VS

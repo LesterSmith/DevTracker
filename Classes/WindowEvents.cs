@@ -78,7 +78,7 @@ namespace DevTracker.Classes
 
                 var devPrjName = string.Empty;
 
-                // We set some globals so the file watcher knows who is running
+                // We set some properties so the file watcher knows who is running
                 _currentApp = wep.MyWindowEvent.AppName;
 
                 bool writeDB = false;
@@ -95,10 +95,14 @@ namespace DevTracker.Classes
                 // i think that is what the index in the match table was
                 // about and then I forgot its purpose and removed it
 
-                //NOTE: simplifying problem by updating below for whichever app when we find a new match
-
+                //NOTE: cfp.GetProjectName also sets writeDB base on multiple checks 
+                // including the config option RECORDAPPS so the decision whether
+                // to record this window is made there
                 var cfp = new CheckForProjectName();
-                devPrjName = cfp.GetProjectName(title, ref accessDenied, _currentApp, out ideMatchObject, ref writeDB);
+                Tuple<string, IDEMatch, bool> cfpObject = cfp.GetProjectName(title, accessDenied, _currentApp, writeDB);
+                devPrjName = cfpObject.Item1;
+                writeDB = cfpObject.Item3;
+                ideMatchObject = cfpObject.Item2;
 
                 // if we are writing this window, and devProjectName not set yet
                 // see if a known project name is being worked on by a non IDE
@@ -107,13 +111,14 @@ namespace DevTracker.Classes
                     // check to see if the window title contains a known project name
                     if (string.IsNullOrWhiteSpace(devPrjName))
                     {
-                        var s = IsProjectInNonIDETitle(title);
+                        var s = cfp.IsProjectInNonIDETitle(title);
                         if (!string.IsNullOrWhiteSpace(s))
                             devPrjName = s;
                     }
                 }
                 else
                 {
+                    // one or more 
                     goto TopOfCode;
                 }
 
@@ -202,11 +207,13 @@ namespace DevTracker.Classes
         #endregion
 
         #region private methods
-        private string IsProjectInNonIDETitle(string title)
-        {
-            var prjObject = Globals.ProjectList.Find(x => title.Contains(x.DevProjectName));
-            return prjObject != null ? prjObject.DevProjectName : string.Empty;
-        }
+        //private string IsProjectInNonIDETitle(string title)
+        //{
+        //    var hlpr = new DHMisc();
+        //    var projects = hlpr.GetDevProjects();
+        //    var prjObject = projects.Find(x => title.Contains(x.DevProjectName));
+        //    return prjObject != null ? prjObject.DevProjectName : string.Empty;
+        //}
 
 
         #endregion

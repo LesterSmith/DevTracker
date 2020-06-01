@@ -16,10 +16,12 @@ namespace DevTracker.Classes
     /// </summary>
     public class CheckForProjectName
     {
-        public string GetProjectName(string title, ref bool accessDenied, string _currentApp, out IDEMatch ideMatchObject, ref bool writeDB)
+        public Tuple<string, IDEMatch, bool> GetProjectName(string title, bool accessDenied, string _currentApp, bool writeDB)
         {
             IDEMatch foundIde = null;
             string devPrjName = string.Empty;
+            bool doWriteDB = writeDB;
+
             foreach (var ide in Globals.IDEMatches)
             {
                 if (!accessDenied && _currentApp.ToLower() == ide.AppName)
@@ -35,7 +37,7 @@ namespace DevTracker.Classes
                             Debug.WriteLine($"ssms: {title}");
 #endif
                         // we found the ide match we are looking for
-                        ideMatchObject = ide;
+                        foundIde = ide;
                         foundIde = ide;
                         // if we are concatinating two fields in ssms to get server.dbname
                         if (!string.IsNullOrWhiteSpace(ide.ProjNameConcat))
@@ -69,9 +71,9 @@ namespace DevTracker.Classes
                         //       user connects to a database which they will have to do in order to do anything in ssms
                         // but there is no need to run an update if the devPrjName == AlternateProjName b/c it is already
                         // that in database; we have to wait til we get a valid project name
-                        if (!string.IsNullOrWhiteSpace(ideMatchObject.AlternateProjName))
+                        if (!string.IsNullOrWhiteSpace(foundIde.AlternateProjName))
                         {
-                            devPrjName = ideMatchObject.AlternateProjName;
+                            devPrjName = foundIde.AlternateProjName;
                         }
                         else
                         {
@@ -136,8 +138,7 @@ namespace DevTracker.Classes
             if (_currentApp.ToLower() == "explorer" && string.IsNullOrWhiteSpace(title))
                 writeDB = false; //  forget 
 
-            ideMatchObject = foundIde;
-            return devPrjName;
+            return Tuple.Create(devPrjName, foundIde, doWriteDB);
         }
 
         private void UpdateUnknownProjectNameForIDEMatch(string devProjectName, string appName, string unknownKey, string machineName, string userName)
@@ -145,9 +146,11 @@ namespace DevTracker.Classes
             var hlpr = new DHWindowEvents(AppWrapper.AppWrapper.DevTrkrConnectionString);
             hlpr.UpdateUnknownProjectNameForIDEMatch(devProjectName, appName, unknownKey, machineName, userName);
         }
-        private string IsProjectInNonIDETitle(string title)
+        public string IsProjectInNonIDETitle(string title)
         {
-            var prjObject = Globals.ProjectList.Find(x => title.Contains(x.DevProjectName));
+            var hlpr = new DHMisc();
+            var projects = hlpr.GetDevProjects();
+            var prjObject = projects.Find(x => title.Contains(x.DevProjectName));
             return prjObject != null ? prjObject.DevProjectName : string.Empty;
         }
     }
