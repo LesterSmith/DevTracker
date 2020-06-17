@@ -1,18 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using BusinessObjects;
-using DevTracker;
 using DevProjects;
-using CodeCounter;
 using System.Diagnostics;
 using DataHelpers;
-
+using AppWrapper;
 namespace DevTracker.Classes
 {
     /// <summary>
@@ -55,15 +48,19 @@ namespace DevTracker.Classes
                         break;
                     }
                 }
-                
+
 
                 //NOTE: the original reason for the FileWatcher is not to record files being manipulated,
                 // Rather it is to help maintain the DevProjects Table with the best information posssible
                 // so that the WindowEvents class can charge the project and to report back to the windowevents
                 // LastWindowEvent the project being worked on by the currentapp
 
+                string syncID = null;
                 var ext = Path.GetExtension(fc.FullPath).Replace(".", string.Empty).ToLower();
-                //var isDevFile = false; // will be true if file is a development file
+#if DEBUG
+                if (ext.Equals("exe") || ext.Equals("dll"))
+                    Debug.WriteLine("binary file");
+#endif
                 var devPath = string.Empty;
                 var devProject = string.Empty;
                 var relativeFileName = string.Empty; // filename past the pathname
@@ -87,7 +84,7 @@ namespace DevTracker.Classes
                     devPath = Path.GetDirectoryName(fc.FullPath);
                     
                     // if devPath not in DevProjects path insert it, else update the pathname
-                    mp.CheckForInsertingNewProjectPath(
+                    syncID = mp.CheckForInsertingNewProjectPath(
                     new DevProjPath
                     {
                         DevProjectName = fc.ProjectName,
@@ -98,13 +95,18 @@ namespace DevTracker.Classes
                         ProjFileExt = projFileObject.IDEProjectExtension
                     }, fc.FullPath);
 
+                    //TODO: a hole in the logic when a project FOLDER is dropped, pasted
+                    //NOTE: not necessarily true b/c if a project is not initially monitord
+                    // by DevTracker, any files created before that and never saved again really
+                    // should not be in the Project Detail report b/c there is no time charged b/c
+                    // of those file anyway.  Showing file code lines for which there is no time
+                    // will by definition skew the cost of a code line down...
                     // since project files (.cs,.vb, etc.) could be created before
                     // the project file (.xxproj), now that we know for sure the
                     // name and path, update all the files that may be missing them
                     //NOTE: also, other project files will be saved after this but
                     // we will not update them here until all files are are saved in the 
                     // project and the project file .xxproj get saved again which is
-                    //TODO: a hole in the logic when a project FOLDER is dropped, pasted
                     // unless we get a method to update all the files in a project .xxproj file
                     // which I just did so instead of the call below, we need to
                     // 1. Get a list of all files from the project file.
@@ -114,7 +116,7 @@ namespace DevTracker.Classes
                     // from the FileWatcher and is processing files in sequence as they are queued
                     // by FileWatcher class
                     // **** PUT NEW UPDATE CODE NEXT TO REPLACE --THINK IT THRU ****
-                    //TODO: below code is not used any more but we need code to update 
+                    //Note: below code is not used any more but we need code to update 
                     // ProjectFiles table but put that code in MaintainProjects Class
                     // it knows the logic of updating the tables
                     //UpdateFileActivityWithProjectNameAndPath(
@@ -144,7 +146,7 @@ namespace DevTracker.Classes
                     {
                         fc.ProjectName = pp.DevProjectName;
                         devPath = pp.DevProjectPath;
-                        mp.CheckForInsertingNewProjectPath(new DevProjPath 
+                        syncID = mp.CheckForInsertingNewProjectPath(new DevProjPath 
                         { 
                             DevProjectName = fc.ProjectName, 
                             DevProjectPath = devPath, 
@@ -162,14 +164,14 @@ namespace DevTracker.Classes
                         Tuple<string, string, string> tuple = mp.GetProjectFromDevFileSave(fc.FullPath, Globals.NotableFiles, ext);
                         if (tuple == null)
                         {
-                            Debug.WriteLine($"Missing Data, Project: {fc.ProjectName}  Path: {devPath}");
+                            Util.LogError($"FileAnalyzer Missing Data, Project: {fc.ProjectName}  Path: {devPath} FileFullPath: {fc.FullPath}");
                             goto TopOfCode;
                         }
                         else
                         {
                             fc.ProjectName = tuple.Item1;
                             devPath = tuple.Item2;
-                            mp.CheckForInsertingNewProjectPath(
+                            syncID = mp.CheckForInsertingNewProjectPath(
                             new DevProjPath
                             {
                                 DevProjectName = tuple.Item1,
@@ -206,7 +208,7 @@ namespace DevTracker.Classes
                     fc.ProjectName = projObj.Item1;
                     devPath = projObj.Item2;
 
-                    mp.CheckForInsertingNewProjectPath(
+                    syncID = mp.CheckForInsertingNewProjectPath(
                         new DevProjPath
                         {
                             DevProjectName = projObj.Item1,
@@ -230,7 +232,10 @@ namespace DevTracker.Classes
                     // yes, this file is project file of a known DevProjects project
                     fc.ProjectName = pp.DevProjectName;
                     devPath = pp.DevProjectPath;
+                    syncID = pp.SyncID;
 
+                    // we update files only here b/c we are not calling mp.CheckForInsertingProject
+                    // as we do when we have an IDE above...
                     mp.UpdateProjectFiles(pp, fc.FullPath, new DHMisc());
                 }
 
@@ -243,10 +248,12 @@ namespace DevTracker.Classes
                 {
                     lock (Globals.LastWindowEvent)
                     {
+                        var hlpr2 = new DHWindowEvents();
                         if (Globals.LastWindowEvent.ID == fc.CurrentWindowID &&
                             string.IsNullOrWhiteSpace(Globals.LastWindowEvent.DevProjectName))
                         {
                             Globals.LastWindowEvent.DevProjectName = fc.ProjectName;
+                            Globals.LastWindowEvent.SyncID = syncID;
                         }
                         else
                         {
@@ -256,7 +263,6 @@ namespace DevTracker.Classes
                             // current file has already been written to database and the
                             // projName is incorrect, it should be the last row
                             // but not necessarily
-                            var hlpr2 = new DHWindowEvents();
                             WindowEvent we = hlpr2.GetLastWindowEventWritten(fc.CurrentWindowID);
 
                             if (we != null && string.IsNullOrWhiteSpace(we.DevProjectName))
@@ -266,188 +272,20 @@ namespace DevTracker.Classes
                                 hlpr2.UpadateProjAndPathInWindowEvent(fc.CurrentWindowID, fc.ProjectName);
                             }
                         }
+                        //update syncid in window events if syncid is known
+                        if (!string.IsNullOrWhiteSpace(syncID))
+                            hlpr2.UpdateWindowEventsWithSyncID(fc.ProjectName, fc.CurrentApp, syncID);
                     }
                 }
 
-                #region obsolete code, commented out, was recording to FileActivity file
-                // TODO: this code appears to be obsolete b/c we dont save fileActivity table anymore
-                // now, we only save data about development files
-                // chk to see if we want to save the file
-                //switch (Globals.FilesToSave)
-                //{
-                //    case FileSaveOption.None:
-                //        goto TopOfCode;
-                //    case FileSaveOption.All:
-                //        break;
-                //    case FileSaveOption.Selected:
-                //        if (!IsFileInteresting(fc.FullPath))
-                //            goto TopOfCode;
-                //        // not interested in binary fills unless part of a devproject
-                //        if ((ext.Equals("dll") || ext.Equals("exe")) && !isDevFile)
-                //            goto TopOfCode;
-                //        break;
-                //}
-
-                // Now, if the file is a dev file and we are to count lines
-                //int codeLines = 0;
-                //int blankLines = 0;
-                //int designerLines = 0;
-                //int commentLines = 0;
-                //if (projFileObject != null && projFileObject.CountLines)
-                //{
-                //    FileLineCounter codeCounter = new FileLineCounter(fc.FullPath);
-                //    if (codeCounter.Success)
-                //    {
-                //        codeLines = codeCounter.numberLines;
-                //        blankLines = codeCounter.numberBlankLines;
-                //        commentLines = codeCounter.numberCommentsLines;
-                //        designerLines = codeCounter.numberLinesInDesignerFiles;
-                //    }
-                //}
-
-                // TODO: file should be recorded in ProjectFiles table not fileActivity
-                //var fa = new FileActivity
-                //{
-                //    Machine = Environment.MachineName,
-                //    DevProjName = fc.ProjectName,
-                //    Filename = fc.FullPath,
-                //    Username = Environment.UserName,
-                //    FileLength = new FileInfo(fc.FullPath).Length,
-                //    LastAction = fc.ChangeType,
-                //    CreatedBy = Environment.UserName,
-                //    UpdatedBy = Environment.UserName,
-                //    LastUpdate = DateTime.Now,
-                //    DevProjectPath = devPath,
-                //    UpdateCount = 1,
-                //    //CodeLines = codeLines,
-                //    //CommentLines = commentLines,
-                //    //BlankLines = blankLines,
-                //    //DesignerLines = designerLines
-                //};
-
-                //var hlpr = new DHFileWatcher();
-                //var rows = hlpr.InsertUpdateFileActivity(fa); 
-                #endregion
                 goto TopOfCode;
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Util.LogError(ex);
                 Globals.FileAnalyzerThreadRunning = false;
             }
         }
-
-        #endregion
-
-
-        #region private methods all obsolete
-        /// <summary>
-        /// This method updates the projectname
-        /// </summary>
-        /// <param name="fileActivity"></param>
-        /// <returns></returns>
-        //private int UpdateFileActivityWithProjectNameAndPath(FileActivity fileActivity)
-        //{
-        //    var hlpr = new DHMisc();
-        //    return hlpr.UpdateFileActivityWithProjectData(fileActivity);
-        //}
-        /// <summary>
-        /// Two things to do here
-        /// 1) if this file is being saved by VS
-        ///    we want to insert the project name into
-        ///    the DevProjName table if not extant
-        ///    and the project path, user, in the project Path table if not extant
-        /// 2) Initially, we are interested only in files saved by VS or
-        ///    they are saved by another app in a known VS projectPath
-        ///    insert/update the file activity table if the file is in 
-        ///    a known project path
-        /// </summary>
-        //private void CheckForInsertingNewProjectPath(DevProjPath projPath)
-        //{
-        //    var hlpr = new DataHelpers.DHFileWatcher();
-        //    var rows = hlpr.CheckForInsertingNewProjectPath(projPath);
-        //}
-
-        //private DevProjPath IsFileInADevProjectPath(string fullPath)
-        //{
-        //    var hlpr = new DataHelpers.DHFileWatcher();
-        //    return hlpr.IsFileInDevPrjPath(fullPath);
-        //}
-
-        //private bool IsFileInteresting(string fileName)
-        //{
-        //    try
-        //    {
-        //        var ext = Path.GetExtension(fileName).ToLower().Substring(1);
-        //        if (string.IsNullOrWhiteSpace(ext))
-        //        {
-        //            return false;
-        //        }
-        //        var o = Globals.NotableFiles.Find(x => x.Extension == ext);
-        //        return o != null;
-        //    }
-        //    catch (Exception)
-        //    {
-        //        //no write access, other app not done
-        //        return false;
-        //    }
-        //}
-        /// <summary>
-        /// TODO: this must be tested
-        /// This method attempts to get the project path by looking for 
-        /// </summary>
-        /// <param name="out projectName"></param>
-        /// <param name="projFileExt"></param>
-        /// <returns>Tuple(projName, projPath)</returns>
-        //private Tuple<string, string> GetProjectPath(string fileFullPath, string projFileExt)
-        //{
-        //    if (string.IsNullOrWhiteSpace(Path.GetFileName(fileFullPath)))
-        //    {
-        //        return null;
-        //    }
-
-        //    var fullPath = fileFullPath;
-        //    var dirName = string.Empty;
-
-        //    while (!string.IsNullOrWhiteSpace(fullPath))
-        //    {
-        //        fullPath = Path.GetDirectoryName(fullPath);
-        //        if (string.IsNullOrWhiteSpace(fullPath))
-        //        {
-        //            return null;
-        //            //projectName = string.Empty;
-        //            //return string.Empty;
-        //        }
-
-        //        dirName = new DirectoryInfo(fullPath).Name;
-        //        var prj = Globals.ProjectList.Find(x => x.DevProjectName.ToLower() == dirName.ToLower());
-
-        //        // we think we have a project path
-        //        if (prj != null)
-        //        {
-        //            var projectName = dirName;
-        //            // we think we have a project path, chek for a xxproj file in the path
-        //            // projFileExt can have multiple delimited extensions
-        //            // mainly b/c c++ proj extension changed in later version
-        //            string[] extensions = projFileExt.Split('|');
-        //            for (int i = 0; i < extensions.Length; i++)
-        //            {
-        //                var projFile = projectName + "." + extensions[i];
-        //                if (File.Exists(Path.Combine(fullPath, projFile)))
-        //                {
-        //                    return Tuple.Create<string, string>(dirName, fullPath);
-        //                    //projectName = dirName;
-        //                    //return fullPath;
-        //                }
-        //            }
-        //            continue;
-        //        }
-        //    }
-        //    return null;
-        //    //projectName = string.Empty;
-        //    //return string.Empty; // did not find a project file in the supposed project directory
-        //}
-
         #endregion
     }
 }

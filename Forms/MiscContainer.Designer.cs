@@ -34,7 +34,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(548, 103);
+            this.ClientSize = new System.Drawing.Size(540, 103);
             this.Name = "MiscContainer";
             this.Text = "Hack For NotifyIcon And Handle";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MiscContainer_FormClosing);

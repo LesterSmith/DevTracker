@@ -1,13 +1,11 @@
 ﻿//#define DONTSYNC
 using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using System.Diagnostics;
 using DataHelpers;
 using BusinessObjects;
 using DevProjects;
-
+using AppWrapper;
 namespace DevTracker.Classes
 {
     public class WindowEvents
@@ -123,6 +121,7 @@ namespace DevTracker.Classes
                 }
 
                 // try to get syncId from DevProjects
+                // note this code will not update syncIDs for non ide apps
                 var hlpr = new DHWindowEvents();
                 if (ideMatchObject != null && !ideMatchObject.IsDBEngine && !string.IsNullOrWhiteSpace(devPrjName))
                 {
@@ -146,24 +145,24 @@ namespace DevTracker.Classes
                 if (item.AppName == "ApplicationFrameHost" && item.WindowTitle.Contains("Solitaire"))
                     item.AppName = item.WindowTitle;
 
-#if DEBUG
                 if (!string.IsNullOrWhiteSpace(item.DevProjectName) && item.DevProjectName.Equals("devenv"))
-                    Debug.WriteLine(item.DevProjectName);
+                    Util.LogError($"WindowEvent, Bad Project Name of 'devenv' from Title: {item.WindowTitle}");
 
                 if (ideMatchObject != null && devPrjName == "DevTracker" && ideMatchObject.AppName == "ssms")
-                    Debug.WriteLine("Conflict Devtracker should not be the project name for ssms");
+                    Util.LogError($"WindowEvents, 'Devtracker' should not be the project name for ssms, Title: {item.WindowTitle}");
 
                 //NOTE: 4 / 27 / 2020 discontinued this doing anything...except writing bad data notes
+                // Window events does not have devpath and therefore is not qualified to insert a project
                 if (ideMatchObject != null && !ideMatchObject.IsIde && !devPrjName.ToLower().Contains(".sql"))
                 {
                     // if next line true
                     if ((!string.IsNullOrWhiteSpace(ideMatchObject.AlternateProjName) && devPrjName == ideMatchObject.AlternateProjName) || devPrjName == ".")
-                        Debug.WriteLine($"Bad Project Name: {devPrjName}");
+                        Util.LogError($"WindowEvents, Bad Project Name: {devPrjName} from Title: {item.WindowTitle}");
                     else
                     {
                         // this is a check for convoluted name going to DevProjectName
                         if ("Connect.to_Repor._DevTrack.".Contains(devPrjName) || devPrjName.EndsWith("."))
-                            Debug.WriteLine($"bad project name = {devPrjName}");
+                            Util.LogError($"WindowEvents bad project name = {devPrjName} from Title: {item.WindowTitle}");
 
                         //NOTE: we should not set an unknown value in the devproject table
                         // the way the sproc is written, this call will insert a new project with unknown path
@@ -172,7 +171,7 @@ namespace DevTracker.Classes
                         // if this is the way a project gets created in DevProjects, it will only get the correct path
                         // from the save of a project file, which only get done when a new project is created
                         else if (string.IsNullOrWhiteSpace(devPrjName) || string.IsNullOrWhiteSpace(ideMatchObject.UnknownValue))
-                            Debug.WriteLine($"Missing Data, Project: {devPrjName}  Path: {ideMatchObject.UnknownValue}");
+                            Util.LogError($"WindowEvents, Missing Data, Project: {devPrjName}  Path: {ideMatchObject.UnknownValue} from Title: {item.WindowTitle}");
                         else
                             // Not sure we want to do this here anymore since
                             // determining a project name is not guaranteed to be
@@ -188,9 +187,9 @@ namespace DevTracker.Classes
 
                     }
                 }
+
                 if (item.AppName == "ssms" && item.DevProjectName == "Microsoft")
-                    Debug.WriteLine("Bad Project name");
-#endif
+                    Util.LogError($"WindowEvents, Bad Project name 'Microsoft' from Title: {item.WindowTitle}");
                 item.DevProjectName = devPrjName;
                 hlpr = new DHWindowEvents();
                 int rows = hlpr.InsertWindowEvent(item);
@@ -199,22 +198,10 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                Debug.Print(ex.Message);
+                Util.LogError(ex);
             }
             goto TopOfCode;
         }
-
-        #endregion
-
-        #region private methods
-        //private string IsProjectInNonIDETitle(string title)
-        //{
-        //    var hlpr = new DHMisc();
-        //    var projects = hlpr.GetDevProjects();
-        //    var prjObject = projects.Find(x => title.Contains(x.DevProjectName));
-        //    return prjObject != null ? prjObject.DevProjectName : string.Empty;
-        //}
-
 
         #endregion
     }

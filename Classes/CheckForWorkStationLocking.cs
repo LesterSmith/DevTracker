@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Win32;
 using System.Diagnostics;
 using BusinessObjects;
@@ -50,11 +46,9 @@ namespace DevTracker.Classes
              * 1) upon lock, write 
              */
             var status = _locked ? "Locked" : "Unlocked";
-            Debug.WriteLine($"Lock Status: {status} Reason: {e.Reason}");
             switch (e.Reason)
             {
                 case SessionSwitchReason.SessionLock: 
-                    Debug.WriteLine($"Lock Encountered at {DateTime.Now}  Status: {status}");
                     if (!_locked)
                     {
                         // first time locked
@@ -71,10 +65,8 @@ namespace DevTracker.Classes
                     }
                     break;
                 case SessionSwitchReason.SessionUnlock: 
-                    Debug.WriteLine($"UnLock Encountered at {DateTime.Now} Status: {status}");
                     if (_locked)
                     {
-                        //if (secondsDiff < )
                         Unlocked();
                     }
                     break;

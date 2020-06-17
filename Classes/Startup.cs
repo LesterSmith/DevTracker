@@ -4,7 +4,7 @@ using System.Threading;
 using DataHelpers;
 using BusinessObjects;
 using System.DirectoryServices.AccountManagement;
-using OutlookCalendar;
+//using OutlookCalendar; // add project and reference when uncommenting
 namespace DevTracker.Classes
 {
     public static class Startup
@@ -42,6 +42,7 @@ namespace DevTracker.Classes
             // dont start filewatcher until window watcher is running
             Globals.FileWatchr = new FileWatcher();
         }
+
         public static void SetupCachedDatabaseData()
         {
             lock (Globals.SyncLockObject)
@@ -94,7 +95,9 @@ namespace DevTracker.Classes
                     //TODO query for today must be implemented here, next line is a dummy
                     // in the future we must read the calendar and write the data to the Meetings table
                     // for now we simply write one calendar entry per day.
-                    _ = new CalendarQuery(DateTime.Today, true);
+
+                   //TODO: uncomment to run simulated calendar query _ = new CalendarQuery(DateTime.Today, true);
+
                     // now update the date in configoptions so we won't do this again today
                     queryDate.Value = DateTime.Today.ToString("MM/dd/yyyy HH:mm:ss");
                     _ = hlpr.InsertUpdateConfigOptions(queryDate);

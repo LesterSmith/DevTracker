@@ -1,4 +1,5 @@
-﻿Multiple processes will run concurrently:
+﻿
+Multiple processes will run concurrently:
 
 1. The ActiveChangeWatcher records to database table DevTrkr..WindowEvents.  This tells us
    what application is in use and how long it is in use.  This is especially interesting

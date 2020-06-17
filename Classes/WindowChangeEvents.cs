@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
-using Microsoft.VisualBasic;
 using BusinessObjects;
-using DevTracker.Classes;
 using System.DirectoryServices.AccountManagement;
+using AppWrapper;
 using System.ComponentModel;
 
 namespace DevTracker.Classes
@@ -247,7 +244,7 @@ namespace DevTracker.Classes
                     };
 
                     if (string.IsNullOrWhiteSpace(we.WindowTitle) || (we.AppName.ToLower() == "ssms" && we.WindowTitle.Contains("Microsoft Visual Studio")))
-                        Debug.WriteLine("Major Problem");
+                        Util.LogError($"WindowChangeEvents, SSMS Bad Project for Title: {we.WindowTitle}");
 
                     Globals.WinEventQueue.Enqueue(
                         new WinEventProcesss
@@ -284,7 +281,7 @@ namespace DevTracker.Classes
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
+                        Util.LogError($"WindowChangeEvent, can't determine AppName: {ex.Message}");
                         currentApp = "Unknown";
                     }
 
@@ -295,7 +292,7 @@ namespace DevTracker.Classes
                         ? mwTitle : $"Unknown title from {currentApp}";
 
                     if (currentApp == "ssms" && title.Contains("Microsoft Visual Studio"))
-                        Debug.WriteLine("Major Problem");
+                        Util.LogError($"WindowChangeEvent, SSMS bad project from {title}");
 
                     string displayName = Globals.DisplayName;
 
@@ -314,12 +311,11 @@ namespace DevTracker.Classes
                         ITProjectID = string.Empty
                     };
 
-#if DEBUG
                     if (Globals.LastWindowEvent.WindowTitle.StartsWith("Unknown"))
                     {
-                        Debug.WriteLine($"     ** TITLE={title}, GetActiveWindowTitle={GetActiveWindowTitle()}");
+                        Util.LogError($"WindowChangeEvent, Bad Title from Title: {title}, GetActiveWindowTitle={GetActiveWindowTitle()}");
                     }
-#endif
+
                     if (!Globals.WindowEventThreadRunning)
                     {
                         Globals.WindowEventThreadRunning = true;

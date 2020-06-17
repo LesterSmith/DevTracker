@@ -1,18 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-//using System.DirectoryServices.AccountManagement;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.Threading;
 using System.Security.Permissions;
-using Microsoft.Win32;
 using BusinessObjects;
 using DataHelpers;
 using System.DirectoryServices.AccountManagement;
@@ -247,12 +238,12 @@ namespace DevTracker.Forms
         private void RegisterForPowerNotifications()
         {
             IntPtr handle = this.Handle;
-            Debug.WriteLine("Handle: " + handle.ToString()); //If this line is omitted, then lastError = 1008 which is ERROR_NO_TOKEN, otherwise, lastError = 0
+            //Util.LogError("Handle: " + handle.ToString()); //If this line is omitted, then lastError = 1008 which is ERROR_NO_TOKEN, otherwise, lastError = 0
             IntPtr hLIDSWITCHSTATECHANGE = RegisterPowerSettingNotification(handle,
                  ref GUID_LIDSWITCH_STATE_CHANGE,
                  DEVICE_NOTIFY_WINDOW_HANDLE);
-            Debug.WriteLine("Registered: " + hLIDSWITCHSTATECHANGE.ToString());
-            Debug.WriteLine("LastError:" + Marshal.GetLastWin32Error().ToString());
+            //Util.LogError("Registered: " + hLIDSWITCHSTATECHANGE.ToString());
+            //Util.LogError("LastError:" + Marshal.GetLastWin32Error().ToString());
         }
 
         private void OnPowerBroadcast(IntPtr wParam, IntPtr lParam)
@@ -326,13 +317,13 @@ namespace DevTracker.Forms
 
         void OnSessionLock()
         {
-            Debug.WriteLine($"** ComputerLocked...{DateTime.Now}");
+            //Util.LogError($"** ComputerLocked...{DateTime.Now}");
             Locked();
         }
 
         void OnSessionUnlock()
         {
-            Debug.WriteLine($"** Computer Unlocked...{DateTime.Now}");
+            //Util.LogError($"** Computer Unlocked...{DateTime.Now}");
             Unlocked();
         }
 

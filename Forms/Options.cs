@@ -1,16 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using DataHelpers;
 using BusinessObjects;
 using DevTracker.Classes;
-
+using AppWrapper;
 namespace DevTracker.Forms
 {
     public enum AddOrUpdate
@@ -41,168 +35,198 @@ namespace DevTracker.Forms
         #region form load
         private void Options_Load(object sender, EventArgs e)
         {
-            Startup.SetupCachedDatabaseData();
-            LoadConfigOptions(); // must be first, others depend on ConfigOptions
-            LoadGeneralOptions();
-            LoadApplications();
-            LoadFiles();
-            LoadPermissions();
-            LoadIDEMatches();
-            LoadDevProjects();
-            EnableDisableControls(false, "tabGeneral");
-            _isDirty = false;
+            try
+            {
+                Startup.SetupCachedDatabaseData();
+                LoadConfigOptions(); // must be first, others depend on ConfigOptions
+                LoadGeneralOptions();
+                LoadApplications();
+                LoadFiles();
+                LoadPermissions();
+                LoadIDEMatches();
+                LoadDevProjects();
+                EnableDisableControls(false, "tabGeneral");
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
         #endregion
 
         #region button events
         private void btnAdd_Click(object sender, EventArgs e)
         {
-            _addUpdate = AddOrUpdate.Add;
-            switch (tabControl1.SelectedTab.Name)
+            try
             {
-                case "tabGeneral":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                _addUpdate = AddOrUpdate.Add;
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
 
-                    break;
-                case "tabApplications":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    txtAppFriendlyName.Clear();
-                    txtAppName.Clear();
-                    lbApplications.Enabled = false;
-                    break;
-                case "tabFiles":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    txtExtension.Clear();
-                    txtProjectFileExtension.Clear();
-                    lbFileExtensions.Enabled = false;
-                    break;
-                case "tabPermissions":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        break;
+                    case "tabApplications":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        txtAppFriendlyName.Clear();
+                        txtAppName.Clear();
+                        lbApplications.Enabled = false;
+                        break;
+                    case "tabFiles":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        txtExtension.Clear();
+                        txtProjectFileExtension.Clear();
+                        lbFileExtensions.Enabled = false;
+                        break;
+                    case "tabPermissions":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
 
-                    break;
-                case "tabMatchObjects":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    txtMatchDescription.Clear();
-                    txtMatchRegex.Clear();
-                    txtMatchGroupName.Clear();
-                    txtMatchUnknownValue.Clear();
-                    txtMatchAppName.Clear();
-                    txtMatchProjNameReplaces.Clear();
-                    txtMatchProjNameConcat.Clear();
-                    txtMatchSequence.Clear();
-                    txtMatchAlternateProjectName.Clear();
-                    txtMatchConcatChar.Clear();
-                    chkMatchIsIDE.Checked = false;
-                    chkIMatchsDBEngine.Checked = false;
-                    lbIDEMatches.Enabled = false;
-                    break;
-                case "tabConfigOptions":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    txtConfigOptionName.Clear();
-                    txtConfigOptionValue.Clear();
-                    txtConfigOptionDescription.Clear();
-                    lbConfigOptions.Enabled = false;
-                    break;
-                case "tabDevProjects":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    txtDevProjectName.Clear();
-                    txtDevProjectPath.Clear();
-                    txtDevProjectITProjectID.Clear();
-                    txtDevProjectIDEAppName.Clear();
-                    txtDevProjectMachine.Clear();
-                    txtDevProjectUserName.Clear();
-                    txtDevProjectCreatedDate.Clear();
-                    txtDevProjectCompletedDate.Clear();
-                    lbDevProjects.Enabled = false;
-                    break;
+                        break;
+                    case "tabMatchObjects":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        txtMatchDescription.Clear();
+                        txtMatchRegex.Clear();
+                        txtMatchGroupName.Clear();
+                        txtMatchUnknownValue.Clear();
+                        txtMatchAppName.Clear();
+                        txtMatchProjNameReplaces.Clear();
+                        txtMatchProjNameConcat.Clear();
+                        txtMatchSequence.Clear();
+                        txtMatchAlternateProjectName.Clear();
+                        txtMatchConcatChar.Clear();
+                        chkMatchIsIDE.Checked = false;
+                        chkIMatchsDBEngine.Checked = false;
+                        lbIDEMatches.Enabled = false;
+                        break;
+                    case "tabConfigOptions":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        txtConfigOptionName.Clear();
+                        txtConfigOptionValue.Clear();
+                        txtConfigOptionDescription.Clear();
+                        lbConfigOptions.Enabled = false;
+                        break;
+                    case "tabDevProjects":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        txtDevProjectName.Clear();
+                        txtDevProjectPath.Clear();
+                        txtDevProjectITProjectID.Clear();
+                        txtDevProjectIDEAppName.Clear();
+                        txtDevProjectMachine.Clear();
+                        txtDevProjectUserName.Clear();
+                        txtDevProjectCreatedDate.Clear();
+                        txtDevProjectCompletedDate.Clear();
+                        lbDevProjects.Enabled = false;
+                        break;
+                }
+                btnCancel.Enabled = true;
+                btnSave.Enabled = true;
+
             }
-            btnCancel.Enabled = true;
-            btnSave.Enabled = true;
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
         private void btnUpdate_Click(object sender, EventArgs e)
         {
-            _addUpdate = AddOrUpdate.Update;
-            switch (tabControl1.SelectedTab.Name)
+            try
             {
-                case "tabGeneral":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                _addUpdate = AddOrUpdate.Update;
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
 
-                    break;
-                case "tabApplications":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    lbApplications.Enabled = false;
-                    break;
-                case "tabFiles":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    lbFileExtensions.Enabled = false;
-                    break;
-                case "tabPermissions":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        break;
+                    case "tabApplications":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        lbApplications.Enabled = false;
+                        break;
+                    case "tabFiles":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        lbFileExtensions.Enabled = false;
+                        break;
+                    case "tabPermissions":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
 
-                    break;
-                case "tabMatchObjects":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    lbIDEMatches.Enabled = false;
-                    break;
-                case "tabConfigOptions":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    lbConfigOptions.Enabled = false;
-                    break;
-                case "tabDevProjects":
-                    EnableDisableControls(true, tabControl1.SelectedTab.Name);
-                    lbDevProjects.Enabled = false;
-                    break;
+                        break;
+                    case "tabMatchObjects":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        lbIDEMatches.Enabled = false;
+                        break;
+                    case "tabConfigOptions":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        lbConfigOptions.Enabled = false;
+                        break;
+                    case "tabDevProjects":
+                        EnableDisableControls(true, tabControl1.SelectedTab.Name);
+                        lbDevProjects.Enabled = false;
+                        break;
+                }
+                btnCancel.Enabled = true;
+                btnSave.Enabled = true;
             }
-            btnCancel.Enabled = true;
-            btnSave.Enabled = true;
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
         private void btnDelete_Click(object sender, EventArgs e)
         {
-            DialogResult dr = MessageBox.Show("Are you sure you want to delete the selected record?", "Confirm Delete", MessageBoxButtons.OK, MessageBoxIcon.Question);
-            if (dr.Equals(DialogResult.No))
-                return;
-            var hlpr = new DHMisc();
-            int rows;
-            switch (tabControl1.SelectedTab.Name)
+            try
             {
-                case "tabGeneral":
+                DialogResult dr = MessageBox.Show("Are you sure you want to delete the selected record?", "Confirm Delete", MessageBoxButtons.OK, MessageBoxIcon.Question);
+                if (dr.Equals(DialogResult.No))
+                    return;
+                var hlpr = new DHMisc();
+                int rows;
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
 
-                    break;
-                case "tabApplications":
-                    rows = hlpr.DeleteApplications(AppList[lbApplications.SelectedIndex].ID);
-                    LoadApplications();
-                    lbApplications.SelectedIndex = 0;
+                        break;
+                    case "tabApplications":
+                        rows = hlpr.DeleteApplications(AppList[lbApplications.SelectedIndex].ID);
+                        LoadApplications();
+                        lbApplications.SelectedIndex = 0;
 
-                    break;
-                case "tabFiles":
-                    rows = hlpr.DeleteNotableFiles(NotableFiles[lbFileExtensions.SelectedIndex].ID);
-                    LoadFiles();
-                    lbFileExtensions.SelectedIndex = 0;
-                    LoadFilesControls();
-                    break;
-                case "tabPermissions":
+                        break;
+                    case "tabFiles":
+                        rows = hlpr.DeleteNotableFiles(NotableFiles[lbFileExtensions.SelectedIndex].ID);
+                        LoadFiles();
+                        lbFileExtensions.SelectedIndex = 0;
+                        LoadFilesControls();
+                        break;
+                    case "tabPermissions":
 
-                    break;
-                case "tabMatchObjects":
-                    rows = hlpr.DeleteProjNameMatches(IDEMatches[lbIDEMatches.SelectedIndex].ID);
-                    LoadIDEMatches();
-                    lbIDEMatches.SelectedIndex = 0;
-                    LoadIDEMatchesControls(IDEMatches[0]);
-                    break;
-                case "tabConfigOptions":
-                    rows = hlpr.DeleteConfigOption(ConfigOptions[lbConfigOptions.SelectedIndex].ID);
-                    LoadConfigOptions();
-                    lbConfigOptions.SelectedIndex = 0;
-                    LoadConfigOptionsControls(ConfigOptions[0]);
-                    break;
-                case "tabDevProjects":
-                    rows = hlpr.DeleteDevProjects(DevProjects[lbDevProjects.SelectedIndex].ID);
-                    LoadDevProjects();
-                    lbDevProjects.SelectedIndex = 0;
-                    LoadDevProjectsControls(DevProjects[0]);
-                    break;
+                        break;
+                    case "tabMatchObjects":
+                        rows = hlpr.DeleteProjNameMatches(IDEMatches[lbIDEMatches.SelectedIndex].ID);
+                        LoadIDEMatches();
+                        lbIDEMatches.SelectedIndex = 0;
+                        LoadIDEMatchesControls(IDEMatches[0]);
+                        break;
+                    case "tabConfigOptions":
+                        rows = hlpr.DeleteConfigOption(ConfigOptions[lbConfigOptions.SelectedIndex].ID);
+                        LoadConfigOptions();
+                        lbConfigOptions.SelectedIndex = 0;
+                        LoadConfigOptionsControls(ConfigOptions[0]);
+                        break;
+                    case "tabDevProjects":
+                        rows = hlpr.DeleteDevProjects(DevProjects[lbDevProjects.SelectedIndex].ID);
+                        LoadDevProjects();
+                        lbDevProjects.SelectedIndex = 0;
+                        LoadDevProjectsControls(DevProjects[0]);
+                        break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
             }
         }
 
@@ -213,163 +237,170 @@ namespace DevTracker.Forms
         }
         private void btnSave_Click(object sender, EventArgs e)
         {
-            DHMisc hlpr;
-            if (!_isDirty)
+            try
             {
-                _errors = "You have not made any changes.";
+                DHMisc hlpr;
+                if (!_isDirty)
+                {
+                    _errors = "You have not made any changes.";
 
+                }
+                _errors = string.Empty;
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
+                        if (!ValidateTabGeneralForSave())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+                        hlpr = new DHMisc();
+                        var item = ConfigOptions.Find(x => x.Name == AppWrapper.AppWrapper.CacheExpirationTime);
+                        item.Value = txtCacheExpirationTime.Text;
+                        hlpr.InsertUpdateConfigOptions(item);
+                        item = ConfigOptions.Find(x => x.Name == AppWrapper.AppWrapper.RecordFiles);
+                        item.Value = rbRecordAllFiles.Checked ? "A" : rbRecordSpecifiedFiles.Checked ? "S" : "N";
+                        hlpr.InsertUpdateConfigOptions(item);
+                        item = ConfigOptions.Find(x => x.Name == AppWrapper.AppWrapper.RecordApps);
+                        item.Value = cbApplications.Text = cbApplications.Text.StartsWith("All") ? "A" : "S";
+                        hlpr.InsertUpdateConfigOptions(item);
+                        LoadConfigOptions();
+                        LoadGeneralControls();
+                        // since config options have been updated,
+                        // reload tabConfigOption listbox
+                        var c = ConfigOptions[0];
+                        LoadConfigOptionsControls(c);
+                        break;
+                    case "tabApplications":
+                        if (!ValidateTabApplicationsForSave())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+                        hlpr = new DHMisc();
+                        var oApp = AppList[lbApplications.SelectedIndex];
+                        if (_addUpdate == AddOrUpdate.Add)
+                            oApp.ID = Guid.NewGuid().ToString();
+                        oApp.AppName = txtAppName.Text;
+                        oApp.AppFriendlyName = txtAppFriendlyName.Text;
+                        hlpr.InsertUpdateNotableApplications(oApp);
+                        LoadApplications();
+                        lbApplications.SelectedIndex = 0;
+                        lbApplications.Enabled = true;
+                        SetButtonsOnTabChange();
+                        break;
+                    case "tabFiles":
+                        if (!ValidateTabFilesForSave())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+
+                        var ext = NotableFiles[lbFileExtensions.SelectedIndex];
+                        ext.Extension = txtExtension.Text;
+                        ext.IDEProjectExtension = txtProjectFileExtension.Text;
+                        ext.CountLines = chkCountLines.Checked;
+                        if (_addUpdate == AddOrUpdate.Add)
+                            ext.ID = Guid.NewGuid().ToString();
+                        hlpr = new DHMisc();
+                        hlpr.InsertUpdateNotableFileTypes(ext);
+                        LoadFiles();
+                        lbFileExtensions.SelectedIndex = 0;
+                        LoadFilesControls();
+                        lbFileExtensions.Enabled = true;
+                        SetButtonsOnTabChange();
+                        break;
+                    case "tabPermissions":
+                        break;
+                    case "tabMatchObjects":
+                        if (!ValidateTabIDEMatches())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+
+                        var ide = IDEMatches[lbIDEMatches.SelectedIndex];
+                        if (_addUpdate == AddOrUpdate.Add)
+                            ide.ID = Guid.NewGuid().ToString();
+                        ide.AlternateProjName = txtMatchAlternateProjectName.Text;
+                        ide.Regex = txtMatchRegex.Text;
+                        ide.Description = txtMatchDescription.Text;
+                        ide.AppName = txtMatchAppName.Text;
+                        ide.RegexGroupName = txtMatchGroupName.Text;
+                        ide.UnknownValue = txtMatchUnknownValue.Text;
+                        ide.ProjNameConcat = txtMatchProjNameConcat.Text;
+                        ide.ProjNameReplaces = txtMatchProjNameReplaces.Text;
+                        if (!string.IsNullOrWhiteSpace(txtMatchSequence.Text))
+                            ide.Sequence = int.Parse(txtMatchSequence.Text);
+                        ide.AlternateProjName = txtMatchAlternateProjectName.Text;
+                        ide.ConcatChar = txtMatchConcatChar.Text;
+                        ide.IsDBEngine = chkIMatchsDBEngine.Checked;
+                        ide.IsIde = chkMatchIsIDE.Checked;
+                        hlpr = new DHMisc();
+                        hlpr.InsertUpdateProjNameMatches(ide);
+                        LoadIDEMatches();
+                        lbIDEMatches.SelectedIndex = 0;
+                        LoadIDEMatchesControls(IDEMatches[0]);
+                        lbIDEMatches.Enabled = true;
+                        SetButtonsOnTabChange();
+                        break;
+                    case "tabConfigOptions":
+                        if (!ValidateTabConfigOptions())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+
+                        hlpr = new DHMisc();
+                        var co = ConfigOptions[lbConfigOptions.SelectedIndex];
+                        if (_addUpdate == AddOrUpdate.Add)
+                            co.ID = Guid.NewGuid().ToString();
+                        co.Name = txtConfigOptionName.Text;
+                        co.Value = txtConfigOptionValue.Text;
+                        co.Description = txtConfigOptionDescription.Text;
+                        hlpr.InsertUpdateConfigOptions(co);
+                        LoadConfigOptions();
+                        lbConfigOptions.SelectedIndex = 0;
+                        LoadConfigOptionsControls(ConfigOptions[0]);
+                        lbConfigOptions.Enabled = true;
+                        // since we have update configoptions update
+                        // the tabGeneral controls as they share the same table
+                        LoadGeneralControls();
+                        lbApplications.Enabled = true;
+                        SetButtonsOnTabChange();
+                        break;
+                    case "tabDevProjects":
+                        if (!ValidateTabDevProjecctsForSave())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+
+                        hlpr = new DHMisc();
+                        var dp = DevProjects[lbDevProjects.SelectedIndex];
+                        if (_addUpdate == AddOrUpdate.Add)
+                            dp.ID = Guid.NewGuid().ToString();
+                        dp.DevProjectName = txtDevProjectName.Text;
+                        dp.DatabaseProject = chkDevProjectDatabaseProject.Checked;
+                        dp.DevProjectPath = txtDevProjectPath.Text;
+                        dp.IDEAppName = txtDevProjectIDEAppName.Text;
+                        dp.Machine = txtDevProjectMachine.Text;
+                        dp.UserName = txtDevProjectUserName.Text;
+                        DateTime date;
+                        if (!string.IsNullOrWhiteSpace(txtDevProjectCompletedDate.Text) && DateTime.TryParse(txtDevProjectCreatedDate.Text, out date))
+                            dp.CompletedDate = date;
+                        hlpr.InsertUpdateDevProject(dp);
+                        LoadDevProjects();
+                        lbDevProjects.SelectedIndex = 0;
+                        LoadDevProjectsControls(DevProjects[0]);
+                        lbIDEMatches.Enabled = true;
+                        SetButtonsOnTabChange();
+                        break;
+                }
             }
-            _errors = string.Empty;
-            switch (tabControl1.SelectedTab.Name)
+            catch (Exception ex)
             {
-                case "tabGeneral":
-                    if (!ValidateTabGeneralForSave())
-                    {
-                        DisplayValidationErrors();
-                        return;
-                    }
-                    hlpr = new DHMisc();
-                    var item = ConfigOptions.Find(x => x.Name == AppWrapper.AppWrapper.CacheExpirationTime);
-                    item.Value = txtCacheExpirationTime.Text;
-                    hlpr.InsertUpdateConfigOptions(item);
-                    item = ConfigOptions.Find(x => x.Name == AppWrapper.AppWrapper.RecordFiles);
-                    item.Value = rbRecordAllFiles.Checked ? "A" : rbRecordSpecifiedFiles.Checked ? "S" : "N";
-                    hlpr.InsertUpdateConfigOptions(item);
-                    item = ConfigOptions.Find(x => x.Name == AppWrapper.AppWrapper.RecordApps);
-                    item.Value = cbApplications.Text = cbApplications.Text.StartsWith("All") ? "A" : "S";
-                    hlpr.InsertUpdateConfigOptions(item);
-                    LoadConfigOptions();
-                    LoadGeneralControls();
-                    // since config options have been updated,
-                    // reload tabConfigOption listbox
-                    var c = ConfigOptions[0];
-                    LoadConfigOptionsControls(c);
-                    break;
-                case "tabApplications":
-                    if (!ValidateTabApplicationsForSave())
-                    {
-                        DisplayValidationErrors();
-                        return;
-                    }
-                    hlpr = new DHMisc();
-                    var oApp = AppList[lbApplications.SelectedIndex];
-                    if (_addUpdate == AddOrUpdate.Add)
-                        oApp.ID = Guid.NewGuid().ToString();
-                    oApp.AppName = txtAppName.Text;
-                    oApp.AppFriendlyName = txtAppFriendlyName.Text;
-                    hlpr.InsertUpdateNotableApplications(oApp);
-                    LoadApplications();
-                    lbApplications.SelectedIndex = 0;
-                    lbApplications.Enabled = true;
-                    SetButtonsOnTabChange();
-                    break;
-                case "tabFiles":
-                    if (!ValidateTabFilesForSave())
-                    {
-                        DisplayValidationErrors();
-                        return;
-                    }
-
-                    var ext = NotableFiles[lbFileExtensions.SelectedIndex];
-                    ext.Extension = txtExtension.Text;
-                    ext.IDEProjectExtension = txtProjectFileExtension.Text;
-                    ext.CountLines = chkCountLines.Checked;
-                    if (_addUpdate == AddOrUpdate.Add)
-                        ext.ID = Guid.NewGuid().ToString();
-                    hlpr = new DHMisc();
-                    hlpr.InsertUpdateNotableFileTypes(ext);
-                    LoadFiles();
-                    lbFileExtensions.SelectedIndex = 0;
-                    LoadFilesControls();
-                    lbFileExtensions.Enabled = true;
-                    SetButtonsOnTabChange();
-                    break;
-                case "tabPermissions":
-                    break;
-                case "tabMatchObjects":
-                    if (!ValidateTabIDEMatches())
-                    {
-                        DisplayValidationErrors();
-                        return;
-                    }
-
-                    var ide = IDEMatches[lbIDEMatches.SelectedIndex];
-                    if (_addUpdate == AddOrUpdate.Add)
-                        ide.ID = Guid.NewGuid().ToString();
-                    ide.AlternateProjName = txtMatchAlternateProjectName.Text;
-                    ide.Regex = txtMatchRegex.Text;
-                    ide.Description = txtMatchDescription.Text;
-                    ide.AppName = txtMatchAppName.Text;
-                    ide.RegexGroupName = txtMatchGroupName.Text;
-                    ide.UnknownValue = txtMatchUnknownValue.Text;
-                    ide.ProjNameConcat = txtMatchProjNameConcat.Text;
-                    ide.ProjNameReplaces = txtMatchProjNameReplaces.Text;
-                    if (!string.IsNullOrWhiteSpace(txtMatchSequence.Text))
-                        ide.Sequence = int.Parse(txtMatchSequence.Text);
-                    ide.AlternateProjName = txtMatchAlternateProjectName.Text;
-                    ide.ConcatChar = txtMatchConcatChar.Text;
-                    ide.IsDBEngine = chkIMatchsDBEngine.Checked;
-                    ide.IsIde = chkMatchIsIDE.Checked;
-                    hlpr = new DHMisc();
-                    hlpr.InsertUpdateProjNameMatches(ide);
-                    LoadIDEMatches();
-                    lbIDEMatches.SelectedIndex = 0;
-                    LoadIDEMatchesControls(IDEMatches[0]);
-                    lbIDEMatches.Enabled = true;
-                    SetButtonsOnTabChange();
-                    break;
-                case "tabConfigOptions":
-                    if (!ValidateTabConfigOptions())
-                    {
-                        DisplayValidationErrors();
-                        return;
-                    }
-
-                    hlpr = new DHMisc();
-                    var co = ConfigOptions[lbConfigOptions.SelectedIndex];
-                    if (_addUpdate == AddOrUpdate.Add)
-                        co.ID = Guid.NewGuid().ToString();
-                    co.Name = txtConfigOptionName.Text;
-                    co.Value = txtConfigOptionValue.Text;
-                    co.Description = txtConfigOptionDescription.Text;
-                    hlpr.InsertUpdateConfigOptions(co);
-                    LoadConfigOptions();
-                    lbConfigOptions.SelectedIndex = 0;
-                    LoadConfigOptionsControls(ConfigOptions[0]);
-                    lbConfigOptions.Enabled = true;
-                    // since we have update configoptions update
-                    // the tabGeneral controls as they share the same table
-                    LoadGeneralControls();
-                    lbApplications.Enabled = true;
-                    SetButtonsOnTabChange();
-                    break;
-                case "tabDevProjects":
-                    if (!ValidateTabDevProjecctsForSave())
-                    {
-                        DisplayValidationErrors();
-                        return;
-                    }
-
-                    hlpr = new DHMisc();
-                    var dp = DevProjects[lbDevProjects.SelectedIndex];
-                    if (_addUpdate == AddOrUpdate.Add)
-                        dp.ID = Guid.NewGuid().ToString();
-                    dp.DevProjectName = txtDevProjectName.Text;
-                    dp.DatabaseProject = chkDevProjectDatabaseProject.Checked;
-                    dp.DevProjectPath = txtDevProjectPath.Text;
-                    dp.IDEAppName = txtDevProjectIDEAppName.Text;
-                    dp.Machine = txtDevProjectMachine.Text;
-                    dp.UserName = txtDevProjectUserName.Text;
-                    DateTime date;
-                    if (!string.IsNullOrWhiteSpace(txtDevProjectCompletedDate.Text) && DateTime.TryParse(txtDevProjectCreatedDate.Text, out date))
-                        dp.CompletedDate = date;
-                    hlpr.InsertUpdateDevProject(dp);
-                    LoadDevProjects();
-                    lbDevProjects.SelectedIndex = 0;
-                    LoadDevProjectsControls(DevProjects[0]);
-                    lbIDEMatches.Enabled = true;
-                    SetButtonsOnTabChange();
-                    break;
+                Util.LogError(ex,true);
             }
         }
 
@@ -379,41 +410,48 @@ namespace DevTracker.Forms
         }
         private void btnCancel_Click(object sender, EventArgs e)
         {
-            switch (tabControl1.SelectedTab.Name)
+            try
             {
-                case "tabGeneral":
-                    LoadGeneralControls();
-                    break;
-                case "tabApplications":
-                    LoadApplicationControls(lbApplications.SelectedIndex);
-                    lbApplications.Enabled = true;
-                    break;
-                case "tabFiles":
-                    LoadFilesControls();
-                    lbFileExtensions.Enabled = true;
-                    break;
-                case "tabPermissions":
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
+                        LoadGeneralControls();
+                        break;
+                    case "tabApplications":
+                        LoadApplicationControls(lbApplications.SelectedIndex);
+                        lbApplications.Enabled = true;
+                        break;
+                    case "tabFiles":
+                        LoadFilesControls();
+                        lbFileExtensions.Enabled = true;
+                        break;
+                    case "tabPermissions":
 
 
-                    break;
-                case "tabMatchObjects":
-                    var m = IDEMatches[lbIDEMatches.SelectedIndex];
-                    LoadIDEMatchesControls(m);
-                    lbIDEMatches.Enabled = true;
-                    break;
-                case "tabConfigOptions":
-                    var item = ConfigOptions[lbConfigOptions.SelectedIndex];
-                    LoadConfigOptionsControls(item);
-                    lbConfigOptions.Enabled = true;
-                    break;
-                case "tabDevProjects":
-                    var itemDP = DevProjects[lbDevProjects.SelectedIndex];
-                    LoadDevProjectsControls(itemDP);
-                    lbDevProjects.Enabled = true;
-                    break;
+                        break;
+                    case "tabMatchObjects":
+                        var m = IDEMatches[lbIDEMatches.SelectedIndex];
+                        LoadIDEMatchesControls(m);
+                        lbIDEMatches.Enabled = true;
+                        break;
+                    case "tabConfigOptions":
+                        var item = ConfigOptions[lbConfigOptions.SelectedIndex];
+                        LoadConfigOptionsControls(item);
+                        lbConfigOptions.Enabled = true;
+                        break;
+                    case "tabDevProjects":
+                        var itemDP = DevProjects[lbDevProjects.SelectedIndex];
+                        LoadDevProjectsControls(itemDP);
+                        lbDevProjects.Enabled = true;
+                        break;
+                }
+                SetButtonsOnTabChange();
+                _isDirty = false;
             }
-            SetButtonsOnTabChange();
-            _isDirty = false;
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
         private void LoadGeneralControls()
         {
@@ -941,15 +979,22 @@ namespace DevTracker.Forms
 
         private void lbApplications_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (lbApplications.SelectedItem == null)
-                return;
+            try
+            {
+                if (lbApplications.SelectedItem == null)
+                    return;
 
-            var p = lbApplications.SelectedIndex;
-            txtAppName.Text = AppList[p].AppName;
-            txtAppFriendlyName.Text = AppList[p].AppFriendlyName;
-            txtAppFriendlyName.Enabled = false;
-            txtAppName.Enabled = false;
-            _isDirty = false;
+                var p = lbApplications.SelectedIndex;
+                txtAppName.Text = AppList[p].AppName;
+                txtAppFriendlyName.Text = AppList[p].AppFriendlyName;
+                txtAppFriendlyName.Enabled = false;
+                txtAppName.Enabled = false;
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
 
@@ -960,64 +1005,100 @@ namespace DevTracker.Forms
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
-            switch (tabControl1.SelectedTab.Name)
+            try
             {
-                case "tabGeneral":
-                    DisableAllTabsButOne("tabGeneral");
-                    break;
-                case "tabApplications":
-                    DisableAllTabsButOne("tabApplications");
-                    lbApplications.SelectedIndex = 0;
-                    break;
-                case "tabFiles":
-                    DisableAllTabsButOne("tabFiles");
-                    lbFileExtensions.SelectedIndex = 0;
-                    break;
-                case "tabPermissions":
-                    DisableAllTabsButOne("tabPermissions");
-                    
-                    break;
-                case "tabMatchObjects":
-                    DisableAllTabsButOne("tabMatchOptions");
-                    lbIDEMatches.SelectedIndex = 0;
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
+                        DisableAllTabsButOne("tabGeneral");
+                        break;
+                    case "tabApplications":
+                        DisableAllTabsButOne("tabApplications");
+                        lbApplications.SelectedIndex = 0;
+                        break;
+                    case "tabFiles":
+                        DisableAllTabsButOne("tabFiles");
+                        lbFileExtensions.SelectedIndex = 0;
+                        break;
+                    case "tabPermissions":
+                        DisableAllTabsButOne("tabPermissions");
 
-                    break;
-                case "tabConfigOptions":
-                    DisableAllTabsButOne("tabConfigOptions");
-                    lbConfigOptions.SelectedIndex = 0;
-                    break;
-                case "tabDevProjects":
-                    DisableAllTabsButOne("tabDevProjects");
-                    lbDevProjects.SelectedIndex = 0;
-                    break; 
+                        break;
+                    case "tabMatchObjects":
+                        DisableAllTabsButOne("tabMatchOptions");
+                        lbIDEMatches.SelectedIndex = 0;
+
+                        break;
+                    case "tabConfigOptions":
+                        DisableAllTabsButOne("tabConfigOptions");
+                        lbConfigOptions.SelectedIndex = 0;
+                        break;
+                    case "tabDevProjects":
+                        DisableAllTabsButOne("tabDevProjects");
+                        lbDevProjects.SelectedIndex = 0;
+                        break;
+                }
+                _isDirty = false;
+
             }
-            _isDirty = false;
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
         private void lbIDEMatches_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var m = IDEMatches[lbIDEMatches.SelectedIndex];
-            LoadIDEMatchesControls(m);
-            _isDirty = false;
+            try
+            {
+                var m = IDEMatches[lbIDEMatches.SelectedIndex];
+                LoadIDEMatchesControls(m);
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
         private void lbFileExtensions_SelectedIndexChanged(object sender, EventArgs e)
         {
-            LoadFilesControls();
-            _isDirty = false;
+            try
+            {
+                LoadFilesControls();
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
         private void lbConfigOptions_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var item = ConfigOptions[lbConfigOptions.SelectedIndex];
-            LoadConfigOptionsControls(item);
-            _isDirty = false;
+            try
+            {
+                var item = ConfigOptions[lbConfigOptions.SelectedIndex];
+                LoadConfigOptionsControls(item);
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
         private void lbDevProjects_SelectedIndexChanged(object sender, EventArgs e)
         {
-            var item = DevProjects[lbDevProjects.SelectedIndex];
-            LoadDevProjectsControls(item);
-            _isDirty = false;
+            try
+            {
+                var item = DevProjects[lbDevProjects.SelectedIndex];
+                LoadDevProjectsControls(item);
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                Util.LogError(ex, true);
+            }
         }
 
         #endregion

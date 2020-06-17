@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using BusinessObjects;
 using DataHelpers;
-
+using AppWrapper;
 namespace DevTracker.Classes
 {
     /// <summary>
@@ -32,13 +28,9 @@ namespace DevTracker.Classes
                     if (m.Success && m.Groups[ide.RegexGroupName] != null &&
                         !string.IsNullOrWhiteSpace(m.Groups[ide.RegexGroupName].Value))
                     {
-#if DEBUG
-                        if (ide.AppName == "ssms")
-                            Debug.WriteLine($"ssms: {title}");
-#endif
                         // we found the ide match we are looking for
                         foundIde = ide;
-                        foundIde = ide;
+
                         // if we are concatinating two fields in ssms to get server.dbname
                         if (!string.IsNullOrWhiteSpace(ide.ProjNameConcat))
                         {
@@ -52,6 +44,12 @@ namespace DevTracker.Classes
                         else
                             devPrjName = m.Groups[ide.RegexGroupName].Value;
 
+                        var msgBox = false;
+#if DEBUG
+                        msgBox = true;
+#endif
+                        if (devPrjName.StartsWith("Microsoft") && _currentApp == "ssms")
+                            Util.LogError($"CheckForProjectName, SSMS Invalid Project: 'Microsoft' from Title: { title}", msgBox);
 
                         if (!string.IsNullOrWhiteSpace(ide.ProjNameReplaces))
                         {
@@ -83,14 +81,14 @@ namespace DevTracker.Classes
                         }
 
                         // since we have found and processed the ide that we wanted, get out
-                        writeDB = true;
+                        doWriteDB = true;
                         goto EndOfGenericCode;
                     }
                     else /// if (m.Success && string.IsNullOrWhiteSpace(m.Groups["PrjName"].Value))
                     {
                         // ide has no project open yet set as unknown
                         devPrjName = ide.UnknownValue;
-                        writeDB = true;
+                        doWriteDB = true;
                         continue;  // loop to see if another IDEMatch row will get the projectname
                     }
                 }
@@ -100,7 +98,7 @@ namespace DevTracker.Classes
 
             // if we are writing this window, and devProjectName not set yet
             // see if a known project name is being worked on by a non IDE
-            if (writeDB)
+            if (doWriteDB)
             {
                 // check to see if the window title contains a known project name
                 if (string.IsNullOrWhiteSpace(devPrjName))
@@ -114,8 +112,8 @@ namespace DevTracker.Classes
             // see if we are interested in recording this window
             // NOTE: we may always want to write the window to DB b/c the company may want to know every app being used
             // especially if we want to run the Developer(user) Detail Report
-            // if writeDB set, then we already know to write this window b/c of ideMatch found
-            if (!writeDB)
+            // if doWriteDB set, then we already know to write this window b/c of ideMatch found
+            if (!doWriteDB)
             {
                 var appConfig = Globals.ConfigOptions.Find(x => x.Name == "RECORDAPPS");
                 if (appConfig != null)
@@ -123,11 +121,11 @@ namespace DevTracker.Classes
                     switch (appConfig.Value)
                     {
                         case "A":
-                            writeDB = true;
+                            doWriteDB = true;
                             break;
                         case "S":
                             var interestingApp = Globals.NotableApplications.Find(o => o.AppName.ToLower() == _currentApp.ToLower());
-                            writeDB = (interestingApp != null);
+                            doWriteDB = (interestingApp != null);
                             break;
                     }
                 }
@@ -136,7 +134,7 @@ namespace DevTracker.Classes
             // explorer is Windows and project explorer but project explorer does not always have a title
             // time spent there is really not interesting so ignore it
             if (_currentApp.ToLower() == "explorer" && string.IsNullOrWhiteSpace(title))
-                writeDB = false; //  forget 
+                doWriteDB = false; //  forget 
 
             return Tuple.Create(devPrjName, foundIde, doWriteDB);
         }

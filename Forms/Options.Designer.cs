@@ -1,4 +1,5 @@
-﻿namespace DevTracker.Forms
+﻿
+namespace DevTracker.Forms
 {
     partial class Options
     {
@@ -49,6 +50,7 @@
             this.lbApplications = new System.Windows.Forms.ListBox();
             this.label5 = new System.Windows.Forms.Label();
             this.tabFiles = new System.Windows.Forms.TabPage();
+            this.chkCountLines = new System.Windows.Forms.CheckBox();
             this.txtProjectFileExtension = new System.Windows.Forms.TextBox();
             this.label15 = new System.Windows.Forms.Label();
             this.label19 = new System.Windows.Forms.Label();
@@ -133,7 +135,6 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.btnClose = new System.Windows.Forms.Button();
-            this.chkCountLines = new System.Windows.Forms.CheckBox();
             this.tabControl1.SuspendLayout();
             this.tabGeneral.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -382,6 +383,19 @@
             this.tabFiles.Size = new System.Drawing.Size(964, 475);
             this.tabFiles.TabIndex = 2;
             this.tabFiles.Text = "Files";
+            // 
+            // chkCountLines
+            // 
+            this.chkCountLines.AutoSize = true;
+            this.chkCountLines.Location = new System.Drawing.Point(130, 287);
+            this.chkCountLines.Name = "chkCountLines";
+            this.chkCountLines.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
+            this.chkCountLines.Size = new System.Drawing.Size(136, 24);
+            this.chkCountLines.TabIndex = 11;
+            this.chkCountLines.Text = "Count Lines";
+            this.chkCountLines.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.toolTip1.SetToolTip(this.chkCountLines, "Only check for project files in text format");
+            this.chkCountLines.UseVisualStyleBackColor = true;
             // 
             // txtProjectFileExtension
             // 
@@ -1191,7 +1205,7 @@
             // 
             this.btnClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnClose.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-            this.btnClose.Location = new System.Drawing.Point(816, 532);
+            this.btnClose.Location = new System.Drawing.Point(817, 532);
             this.btnClose.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btnClose.Name = "btnClose";
             this.btnClose.Size = new System.Drawing.Size(112, 35);
@@ -1199,19 +1213,6 @@
             this.btnClose.Text = "&Close";
             this.btnClose.UseVisualStyleBackColor = true;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click_1);
-            // 
-            // chkCountLines
-            // 
-            this.chkCountLines.AutoSize = true;
-            this.chkCountLines.Location = new System.Drawing.Point(130, 287);
-            this.chkCountLines.Name = "chkCountLines";
-            this.chkCountLines.RightToLeft = System.Windows.Forms.RightToLeft.Yes;
-            this.chkCountLines.Size = new System.Drawing.Size(136, 24);
-            this.chkCountLines.TabIndex = 11;
-            this.chkCountLines.Text = "Count Lines";
-            this.chkCountLines.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.toolTip1.SetToolTip(this.chkCountLines, "Only check for project files in text format");
-            this.chkCountLines.UseVisualStyleBackColor = true;
             // 
             // Options
             // 

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Windows.Forms;
 using System.IO;
 using BusinessObjects;
 using DataHelpers;
+using System.Diagnostics;
 namespace DevTracker.Classes
 {
     public enum FWType
@@ -107,7 +106,6 @@ namespace DevTracker.Classes
             lock (Globals.SyncLockObject)
             {
                 Globals.FileChangeQueue.Enqueue(fc);
-
                 if (!Globals.FileAnalyzerThreadRunning)
                 {
                     Globals.FileAnalyzerThreadRunning = true;
@@ -132,8 +130,7 @@ namespace DevTracker.Classes
             watcher.Path = watch_folder;
             /* Watch for changes in LastAccess and LastWrite times, and
                the renaming of files or directories. */
-            //TODO If a developer renames a folder within a project path we will have a problem charging
-            //     the project with apps working on project files....
+
             watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
                | NotifyFilters.FileName | NotifyFilters.DirectoryName;
             watcher.Filter = "*.*";

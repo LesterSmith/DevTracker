@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-//using System.Threading;
 using System.Timers;
 using System.Diagnostics;
-using System.Threading.Tasks;
-
+using AppWrapper;
 namespace DevTracker.Classes
 {
     public static class WindowPolling 
@@ -69,7 +64,7 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.Message);
+                Util.LogError(ex);
             }
         }
 

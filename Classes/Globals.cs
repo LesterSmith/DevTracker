@@ -41,8 +41,6 @@ namespace DevTracker.Classes
         // So the FilesToSave property is no longer needed
         //public static FileSaveOption FilesToSave{get;set;}
         public static int CacheTimeout { get; set; }
-        //NOTE: no longer cached, could grow too large && two much unneeded data
-        //public static List<DevProjPath> ProjectList { get; set; }
         public static string DisplayName { get; set; }
         //*********** End of Cached Objects ****************************
 
@@ -53,5 +51,6 @@ namespace DevTracker.Classes
         public static List<MatchUnknown> Unknowns { get; set; }
         public static WindowChangeEvents WindowChangeEventHandler { get; set; }
         public static FileWatcher FileWatchr { get; set; }
+
     }
 }

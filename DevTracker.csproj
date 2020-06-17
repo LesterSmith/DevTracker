@@ -58,7 +58,6 @@
     <Compile Include="Classes\AppWrapperLocal.cs" />
     <Compile Include="Classes\CheckForProjectName.cs" />
     <Compile Include="Classes\CheckForWorkStationLocking.cs" />
-    <Compile Include="Classes\DevProjectUtility.cs" />
     <Compile Include="Classes\DummyLockObject.cs" />
     <Compile Include="Classes\FileAnalyzer.cs" />
     <Compile Include="Classes\FileWatcher.cs" />
@@ -162,10 +161,6 @@
     <ProjectReference Include="..\DevTrkr DLLs\DevTrkrReports\DevTrkrReports.csproj">
       <Project>{23c9c59c-1ee6-47f3-b85e-da36deccf42e}</Project>
       <Name>DevTrkrReports</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\DevTrkr DLLs\OutlookCalendar\OutlookCalendar.csproj">
-      <Project>{6a3131f8-8e03-4744-82cc-e47590d8375c}</Project>
-      <Name>OutlookCalendar</Name>
     </ProjectReference>
     <ProjectReference Include="..\HHIImage\HHIImage.vbproj">
       <Project>{18ae9580-6bac-4e88-9f31-5ce478d0111a}</Project>

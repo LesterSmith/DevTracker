@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.28922.388
+VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTracker", "DevTracker.csproj", "{426F2065-DFA5-4F1B-A677-A8450E8B958F}"
 EndProject
@@ -12,10 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessObjects", "..\DevTrkr DLLs\BusinessObjects\BusinessObjects.csproj", "{A847B310-12FE-4F61-9D71-3B69B6B5072B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTrkrReports", "..\DevTrkr DLLs\DevTrkrReports\DevTrkrReports.csproj", "{23C9C59C-1EE6-47F3-B85E-DA36DECCF42E}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutlookCalendar", "..\DevTrkr DLLs\OutlookCalendar\OutlookCalendar.csproj", "{6A3131F8-8E03-4744-82CC-E47590D8375C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevTrkrTestDriver", "..\DevTrkrTestDriver\DevTrkrTestDriver.csproj", "{60D9D4CF-4598-40FE-9226-00D932C0B76C}"
 EndProject
 Project("{F184B08F-C81C-45F6-A57F-5ABD9991F28F}") = "HHIImage", "..\HHIImage\HHIImage.vbproj", "{18AE9580-6BAC-4E88-9F31-5CE478D0111A}"
 EndProject
@@ -71,22 +67,6 @@ Global
 		{23C9C59C-1EE6-47F3-B85E-DA36DECCF42E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{23C9C59C-1EE6-47F3-B85E-DA36DECCF42E}.Release|x86.ActiveCfg = Release|Any CPU
 		{23C9C59C-1EE6-47F3-B85E-DA36DECCF42E}.Release|x86.Build.0 = Release|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Debug|x86.Build.0 = Debug|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Release|x86.ActiveCfg = Release|Any CPU
-		{6A3131F8-8E03-4744-82CC-E47590D8375C}.Release|x86.Build.0 = Release|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Debug|x86.Build.0 = Debug|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Release|x86.ActiveCfg = Release|Any CPU
-		{60D9D4CF-4598-40FE-9226-00D932C0B76C}.Release|x86.Build.0 = Release|Any CPU
 		{18AE9580-6BAC-4E88-9F31-5CE478D0111A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18AE9580-6BAC-4E88-9F31-5CE478D0111A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18AE9580-6BAC-4E88-9F31-5CE478D0111A}.Debug|x86.ActiveCfg = Debug|Any CPU
@@ -116,6 +96,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {F0AF969D-8EFA-4CB5-BBB3-3882351EF4A0}
+		SolutionGuid = {E4C8BE11-0530-4114-A8DF-8C4EB80C2D3A}
 	EndGlobalSection
 EndGlobal

@@ -742,6 +742,35 @@ BEGIN
 END
 GO
 
+USE [DevTrkr]
+GO
+/****** Object:  StoredProcedure [dbo].[GetProjectsForReporting]    Script Date: 6/10/2020 12:34:08 PM ******/
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 6/3/2020
+-- =============================================
+Create PROCEDURE [dbo].[GetProjectsForReporting] 
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select p.DevProjectName, p.UserName, p.SyncID, s.DevProjectCount, p.GitURL, p.DevSLNPath
+	From DevTrkr..DevProjects p with (nolock)
+	Inner Join DevTrkr..ProjectSync s with (nolock) on p.SyncID = s.ID
+	order by p.DevProjectName, p.SyncID, s.DevProjectCount desc
+
+	Select distinct UserDisplayName, username
+	from DevTrkr..windowevents with (nolock)
+
+END
+
 
 USE [DevTrkr]
 GO
@@ -755,7 +784,7 @@ GO
 -- Create date: 5/14/2020
 -- plan is to insert only when we have a gitURL to trigger it
 -- =============================================
-ALTER PROCEDURE [dbo].[InsertUpdateProjectSync] 
+CREATE PROCEDURE [dbo].[InsertUpdateProjectSync] 
 	@ID uniqueidentifier,
 	@DevProjectName varchar (255),
 	@CreatedDate datetime,
@@ -1284,6 +1313,30 @@ BEGIN
     Update DevTrkr..ProjectSync
 	Set GitURL = @GitURL
 	Where ID = @ID
+END
+GO
+
+USE DevTrkr
+go
+
+SET ANSI_NULLS ON
+GO
+SET QUOTED_IDENTIFIER ON
+GO
+-- =============================================
+-- Author:		Les Smith
+-- Create date: 6/2/2020
+-- =============================================
+CREATE PROCEDURE [dbo].[GetProjectSyncs] 
+
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON;
+
+    Select * from DevTrkr..ProjectSync
+	Order by DevProjectName, DevProjectCount desc
 END
 GO
 
@@ -2046,7 +2099,7 @@ GO
 -- Author:		Les Smith
 -- Create date: 4/27/2020
 -- =============================================
-ALTER PROCEDURE [dbo].[InsertProjectSyncObject] 
+CREATE PROCEDURE [dbo].[InsertProjectSyncObject] 
 	@ID uniqueidentifier,
 	@DevProjectName varchar (255),
 	@CreatedDate datetime,
