@@ -6,7 +6,8 @@ namespace DevTracker.Classes
 {
     public static class WindowPolling 
     {
-        private static string LastTitle = "DevTracker";
+        // private static string LastTitle = "DevTracker";
+        private static string LastApp = "devenv";
         public static Timer Timer { get; set; } 
 
         /// <summary>
@@ -41,16 +42,27 @@ namespace DevTracker.Classes
             {
                 Timer.Enabled = false;
 
-                string title = Globals.WindowChangeEventHandler.GetActiveWindowTitle(out IntPtr hwnd);
-
-                if (title == null || LastTitle == title)
+                //string title = Globals.WindowChangeEventHandler.GetActiveWindowTitle(out IntPtr hwnd);
+                Tuple<string, string, string, IntPtr> tuple = ProcessData.GetCurrentProcessData();
+                if (tuple == null)
                 {
                     Timer.Enabled = true;
                     return;
                 }
 
+                var currentApp = tuple.Item1;
+                IntPtr hwnd = tuple.Item4;
+                //if (title == null || LastTitle == title)
+                if (currentApp == null || currentApp == "explorer" || currentApp == "AccessDenied" || LastApp == currentApp)
+                {
+                    Timer.Enabled = true;
+                    return;
+                }
+
+                //Debug.WriteLine($"LastApp: {LastApp}  CurrentApp: {currentApp} Time: {DateTime.Now.ToString("MM/ddy/yyy HH:mm:ss")}");
                 // remember the new title 
-                LastTitle = !string.IsNullOrWhiteSpace(title) ? title : "Title empty";
+                //LastTitle = !string.IsNullOrWhiteSpace(title) ? title : "Title empty";
+                LastApp = currentApp;
 
                 IntPtr intPtr = new IntPtr();
                 uint uInt = new uint();

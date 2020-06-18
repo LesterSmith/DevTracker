@@ -47,7 +47,7 @@ namespace DevTracker.Forms
             TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
             TrayIcon.BalloonTipText = "Instead of double-clicking the Icon, please right-click the Icon and select a context menu option.";
             TrayIcon.BalloonTipTitle = "Use the Context Menu";
-            TrayIcon.Text = "DevTrkr Context Menu";
+            TrayIcon.Text = "DevTracker Context Menu";
 
             //The icon is added to the project resources. Here I assume that the name of the file is 'TrayIcon.ico'
             TrayIcon.Icon = Properties.Resources.Role;
@@ -96,7 +96,7 @@ namespace DevTracker.Forms
             // 
             this.CloseMenuItem.Name = "CloseMenuItem";
             this.CloseMenuItem.Size = new Size(152, 22);
-            this.CloseMenuItem.Text = "Close DevTrkr Application";
+            this.CloseMenuItem.Text = "Close DevTracker Application";
             this.CloseMenuItem.Click += new EventHandler(this.CloseMenuItem_Click);
 
             this.RunReports.Name = "RunReports";
@@ -155,8 +155,8 @@ namespace DevTracker.Forms
         {
             TrayIcon.Visible = false;
             Application.DoEvents();
-            if (MessageBox.Show("Do you really want to close DevTrkr?  Your development activity will no longer be tracked, which may not be a good thing for you.",
-                                "Close DevTrkr?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
+            if (MessageBox.Show("Do you really want to close DevTracker?  Your development activity will no longer be tracked, which may not be a good thing for you.",
+                                "Close DevTracker?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
                                 MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 Classes.Startup.ShutDown();
@@ -345,19 +345,11 @@ namespace DevTracker.Forms
             WindowPolling.SuspendWindowPolling();
 
             // Try to get the project name for the Globals.LastWindowEvent
-            var cfp = new Classes.CheckForProjectName();
-#if DEBUG
-            // the following call is not finding the projectname
-            Console.WriteLine($"Call cfp.GetProjectNam, title={Globals.LastWindowEvent.WindowTitle}, appname={Globals.LastWindowEvent.AppName}");
-#endif           
-            Tuple<string, IDEMatch, bool> cfpObject = cfp.GetProjectName(Globals.LastWindowEvent.WindowTitle, accessDenied, Globals.LastWindowEvent.AppName, writeDB);
+            var cfp = new CheckForProjectName();
+            Tuple<string, IDEMatch, bool, string> cfpObject = cfp.GetProjectName(Globals.LastWindowEvent.WindowTitle, accessDenied, Globals.LastWindowEvent.AppName, writeDB);
             string devProjectName = cfpObject.Item1;
             ideMatchObject = cfpObject.Item2;
             writeDB = cfpObject.Item3;
-#if DEBUG
-            var id = ideMatchObject != null ? ideMatchObject.ID.ToString() : string.Empty;
-            Console.WriteLine($"devProjectName={devProjectName}, writeDB={writeDB}, MatchObject = {id}, LastWinEv.DevPrjName={Globals.LastWindowEvent.DevProjectName}");
-#endif
             if (string.IsNullOrWhiteSpace(Globals.LastWindowEvent.DevProjectName))
                 Globals.LastWindowEvent.DevProjectName = devProjectName;
 
@@ -367,9 +359,6 @@ namespace DevTracker.Forms
             {
                 // now, make it look like the current window when the lock occurs is being moved away from
                 // by writing it to database
-#if DEBUG
-                Console.WriteLine($"     ** Locked Writing Time: {LockStartTime} AppName: {Globals.LastWindowEvent.AppName} Title: {Globals.LastWindowEvent.WindowTitle} Project: {Globals.LastWindowEvent.DevProjectName}");
-#endif
                 Globals.LastWindowEvent.EndTime = LockStartTime;
                 hlpr.InsertWindowEvent(Globals.LastWindowEvent);
 

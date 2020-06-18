@@ -57,10 +57,6 @@ namespace DevTracker.Classes
 
                 string syncID = null;
                 var ext = Path.GetExtension(fc.FullPath).Replace(".", string.Empty).ToLower();
-#if DEBUG
-                if (ext.Equals("exe") || ext.Equals("dll"))
-                    Debug.WriteLine("binary file");
-#endif
                 var devPath = string.Empty;
                 var devProject = string.Empty;
                 var relativeFileName = string.Empty; // filename past the pathname
@@ -115,18 +111,6 @@ namespace DevTracker.Classes
                     // We can do this without being concerned about time b/c this class runs on separate thread
                     // from the FileWatcher and is processing files in sequence as they are queued
                     // by FileWatcher class
-                    // **** PUT NEW UPDATE CODE NEXT TO REPLACE --THINK IT THRU ****
-                    //Note: below code is not used any more but we need code to update 
-                    // ProjectFiles table but put that code in MaintainProjects Class
-                    // it knows the logic of updating the tables
-                    //UpdateFileActivityWithProjectNameAndPath(
-                    //    new FileActivity
-                    //    {
-                    //        DevProjName = fc.ProjectName,
-                    //        DevProjectPath = devPath,
-                    //        Machine = Environment.MachineName,
-                    //        Username = Environment.UserName
-                    //    });
                 }
                 else if (ideMatch != null
                             && ideMatch.IsIde
@@ -269,7 +253,7 @@ namespace DevTracker.Classes
                             {
                                 // update the window event that was current when this file was modified
                                 // with the correct proj name so work on this file gets charged
-                                hlpr2.UpadateProjAndPathInWindowEvent(fc.CurrentWindowID, fc.ProjectName);
+                                hlpr2.UpadateProjAndPathInWindowEvent(fc.CurrentWindowID, fc.ProjectName, syncID);
                             }
                         }
                         //update syncid in window events if syncid is known

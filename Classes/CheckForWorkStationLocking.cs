@@ -87,7 +87,7 @@ namespace DevTracker.Classes
 
             // Try to get the project name for the Globals.LastWindowEvent
             var cfp = new Classes.CheckForProjectName();
-            Tuple<string, IDEMatch, bool> cfpObject = cfp.GetProjectName(Globals.LastWindowEvent.WindowTitle, accessDenied, Globals.LastWindowEvent.AppName, writeDB);
+            Tuple<string, IDEMatch, bool, string> cfpObject = cfp.GetProjectName(Globals.LastWindowEvent.WindowTitle, accessDenied, Globals.LastWindowEvent.AppName, writeDB);
             string devProjectName = cfpObject.Item1;
             writeDB = cfpObject.Item3;
             ideMatchObject = cfpObject.Item2;

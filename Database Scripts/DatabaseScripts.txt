@@ -1,11 +1,10 @@
-﻿-- **** Tables ****
+﻿-- **** Tables ****   
 USE [DevTrkr]
 GO
 
 USE [DevTrkr]
 GO
 
-/****** Object:  Table [dbo].[ProjectFiles]    Script Date: 5/12/2020 3:28:33 PM ******/
 SET ANSI_NULLS ON
 GO
 
@@ -1247,7 +1246,8 @@ GO
 -- =============================================
 CREATE PROCEDURE [dbo].[UpadateDevProjNameInWindowEvent]
 	@ID uniqueidentifier,
-	@DevProjectName varchar (100)
+	@DevProjectName varchar (100),
+	@SyncID uniqueidentifier
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -1255,7 +1255,8 @@ BEGIN
 	SET NOCOUNT Off;
 
 	Update DevTrkr..WindowEvents
-	Set DevProjectName = @DevProjectName
+	Set DevProjectName = @DevProjectName,
+		SyncID = @SyncID
 	Where ID = @ID
 END
 

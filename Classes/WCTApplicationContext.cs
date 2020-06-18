@@ -36,7 +36,7 @@ namespace DevTracker.Classes
             TrayIcon.BalloonTipIcon = ToolTipIcon.Info;
             TrayIcon.BalloonTipText = "Instead of double-clicking the Icon, please right-click the Icon and select a context menu option.";
             TrayIcon.BalloonTipTitle = "Use the Context Menu";
-            TrayIcon.Text = "DevTrkr Context Menu";
+            TrayIcon.Text = "DevTracker Context Menu";
 
             //The icon is added to the project resources. Here I assume that the name of the file is 'TrayIcon.ico'
             TrayIcon.Icon = Properties.Resources.TrayIcon;
@@ -85,7 +85,7 @@ namespace DevTracker.Classes
             // 
             this.CloseMenuItem.Name = "CloseMenuItem";
             this.CloseMenuItem.Size = new Size(152, 22);
-            this.CloseMenuItem.Text = "Close DevTrkr Application";
+            this.CloseMenuItem.Text = "Close DevTracker Application";
             this.CloseMenuItem.Click += new EventHandler(this.CloseMenuItem_Click);
 
             this.RunForm1.Name = "RunReports";
@@ -143,8 +143,8 @@ namespace DevTracker.Classes
         {
             TrayIcon.Visible = false;
             Application.DoEvents();
-            if (MessageBox.Show("Do you really want to close DevTrkr?  Your development activity will no longer be tracked, which may not be a good thing for you.",
-                                "Close DevTrkr?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
+            if (MessageBox.Show("Do you really want to close DevTracker?  Your development activity will no longer be tracked, which may not be a good thing for you.",
+                                "Close DevTracker?", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation,
                                 MessageBoxDefaultButton.Button2) == DialogResult.Yes)
             {
                 Startup.ShutDown();

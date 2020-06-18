@@ -63,6 +63,7 @@
     <Compile Include="Classes\FileWatcher.cs" />
     <Compile Include="Classes\GetCurrentWindowCaption.cs" />
     <Compile Include="Classes\Globals.cs" />
+    <Compile Include="Classes\ProcessData.cs" />
     <Compile Include="Classes\Startup.cs" />
     <Compile Include="Classes\WCTApplicationContext.cs" />
     <Compile Include="Classes\WindowChangeEvents.cs" />

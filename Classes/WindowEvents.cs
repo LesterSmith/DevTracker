@@ -30,8 +30,8 @@ namespace DevTracker.Classes
         //[DllImport("user32.dll")]
         //static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
-        List<ProjectName> projects = new List<ProjectName>();
-        private Process process { get; set; }
+        //List<ProjectName> projects = new List<ProjectName>();
+        //private Process process { get; set; }
         #endregion
 
         #region ..ctor
@@ -75,6 +75,7 @@ namespace DevTracker.Classes
                 string displayName = wep.MyWindowEvent.UserDisplayName;
 
                 var devPrjName = string.Empty;
+                var syncId = string.Empty;
 
                 // We set some properties so the file watcher knows who is running
                 _currentApp = wep.MyWindowEvent.AppName;
@@ -97,10 +98,11 @@ namespace DevTracker.Classes
                 // including the config option RECORDAPPS so the decision whether
                 // to record this window is made there
                 var cfp = new CheckForProjectName();
-                Tuple<string, IDEMatch, bool> cfpObject = cfp.GetProjectName(title, accessDenied, _currentApp, writeDB);
+                Tuple<string, IDEMatch, bool, string> cfpObject = cfp.GetProjectName(title, accessDenied, _currentApp, writeDB);
                 devPrjName = cfpObject.Item1;
                 writeDB = cfpObject.Item3;
                 ideMatchObject = cfpObject.Item2;
+                wep.MyWindowEvent.SyncID = cfpObject.Item4;
 
                 // if we are writing this window, and devProjectName not set yet
                 // see if a known project name is being worked on by a non IDE
@@ -109,9 +111,12 @@ namespace DevTracker.Classes
                     // check to see if the window title contains a known project name
                     if (string.IsNullOrWhiteSpace(devPrjName))
                     {
-                        var s = cfp.IsProjectInNonIDETitle(title);
-                        if (!string.IsNullOrWhiteSpace(s))
-                            devPrjName = s;
+                        Tuple<string, string> prjObject = cfp.IsProjectInNonIDETitle(title);
+                        if (prjObject != null)
+                        {
+                            devPrjName = prjObject.Item1;
+                            wep.MyWindowEvent.SyncID = prjObject.Item2;
+                        }
                     }
                 }
                 else
@@ -121,27 +126,24 @@ namespace DevTracker.Classes
                 }
 
                 // try to get syncId from DevProjects
-                // note this code will not update syncIDs for non ide apps
                 var hlpr = new DHWindowEvents();
-                if (ideMatchObject != null && !ideMatchObject.IsDBEngine && !string.IsNullOrWhiteSpace(devPrjName))
+                if (/*ideMatchObject != null && !ideMatchObject.IsDBEngine && */!string.IsNullOrWhiteSpace(devPrjName))
                 {
                     MaintainProject mp = new MaintainProject();
                     // bypass next line until we get fw debugged
-#if !DONTSYNC
-                    wep.MyWindowEvent.SyncID = mp.GetProjectSyncIDForProjectName(devPrjName, _currentApp);
-#endif
+                    if (string.IsNullOrWhiteSpace(wep.MyWindowEvent.SyncID))
+                        wep.MyWindowEvent.SyncID = mp.GetProjectSyncIDForProjectName(devPrjName, _currentApp);
+
                     // here we should update any WindowEvents that have been created by this appname
                     // and for this project w/o a syncid
                     if (!string.IsNullOrWhiteSpace(wep.MyWindowEvent.SyncID))
                         hlpr.UpdateWindowEventsWithSyncID(devPrjName, _currentApp, wep.MyWindowEvent.SyncID);
                 }
 
-                WindowEvent item;
-
                 /* Here, we are going to record the window in db
                  * there are other threads, FileWatcher, changing this object 
                  * and we want no conflict  */
-                item = wep.MyWindowEvent;
+                WindowEvent item = wep.MyWindowEvent;
                 if (item.AppName == "ApplicationFrameHost" && item.WindowTitle.Contains("Solitaire"))
                     item.AppName = item.WindowTitle;
 

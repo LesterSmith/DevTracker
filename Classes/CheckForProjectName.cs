@@ -7,16 +7,25 @@ using AppWrapper;
 namespace DevTracker.Classes
 {
     /// <summary>
-    /// This class created b/c this code needed the GetProjectName code besides
-    /// WindowEvents class
+    /// return tuple(devProjectName, IDEMatchObject, bool denoting write window or not)
+    /// it has no access to syncId for project
     /// </summary>
     public class CheckForProjectName
     {
-        public Tuple<string, IDEMatch, bool> GetProjectName(string title, bool accessDenied, string _currentApp, bool writeDB)
+        /// <summary>
+        /// Get project name from a window title using known IDE regexes
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="accessDenied"></param>
+        /// <param name="_currentApp"></param>
+        /// <param name="writeDB"></param>
+        /// <returns>Tuple(devProjName, ideMatchObject, true to write windowevent, possible syncId)</returns>
+        public Tuple<string, IDEMatch, bool, string> GetProjectName(string title, bool accessDenied, string _currentApp, bool writeDB)
         {
             IDEMatch foundIde = null;
             string devPrjName = string.Empty;
             bool doWriteDB = writeDB;
+            string syncId = string.Empty;
 
             foreach (var ide in Globals.IDEMatches)
             {
@@ -44,12 +53,8 @@ namespace DevTracker.Classes
                         else
                             devPrjName = m.Groups[ide.RegexGroupName].Value;
 
-                        var msgBox = false;
-#if DEBUG
-                        msgBox = true;
-#endif
                         if (devPrjName.StartsWith("Microsoft") && _currentApp == "ssms")
-                            Util.LogError($"CheckForProjectName, SSMS Invalid Project: 'Microsoft' from Title: { title}", msgBox);
+                            Util.LogError($"CheckForProjectName, SSMS Invalid Project: 'Microsoft' from Title: { title}");
 
                         if (!string.IsNullOrWhiteSpace(ide.ProjNameReplaces))
                         {
@@ -103,9 +108,12 @@ namespace DevTracker.Classes
                 // check to see if the window title contains a known project name
                 if (string.IsNullOrWhiteSpace(devPrjName))
                 {
-                    var s = IsProjectInNonIDETitle(title);
-                    if (!string.IsNullOrWhiteSpace(s))
-                        devPrjName = s;
+                    Tuple<string, string> prjObject = IsProjectInNonIDETitle(title);
+                    if (prjObject != null)
+                    {
+                        devPrjName = prjObject.Item1;
+                        syncId = prjObject.Item2;
+                    }
                 }
             }
 
@@ -136,7 +144,7 @@ namespace DevTracker.Classes
             if (_currentApp.ToLower() == "explorer" && string.IsNullOrWhiteSpace(title))
                 doWriteDB = false; //  forget 
 
-            return Tuple.Create(devPrjName, foundIde, doWriteDB);
+            return Tuple.Create(devPrjName, foundIde, doWriteDB, syncId);
         }
 
         private void UpdateUnknownProjectNameForIDEMatch(string devProjectName, string appName, string unknownKey, string machineName, string userName)
@@ -144,12 +152,12 @@ namespace DevTracker.Classes
             var hlpr = new DHWindowEvents(AppWrapper.AppWrapper.DevTrkrConnectionString);
             hlpr.UpdateUnknownProjectNameForIDEMatch(devProjectName, appName, unknownKey, machineName, userName);
         }
-        public string IsProjectInNonIDETitle(string title)
+        public Tuple<string, string> IsProjectInNonIDETitle(string title)
         {
             var hlpr = new DHMisc();
             var projects = hlpr.GetDevProjects();
             var prjObject = projects.Find(x => title.Contains(x.DevProjectName));
-            return prjObject != null ? prjObject.DevProjectName : string.Empty;
+            return prjObject == null ? null : Tuple.Create(prjObject.DevProjectName, prjObject.SyncID);
         }
     }
 }

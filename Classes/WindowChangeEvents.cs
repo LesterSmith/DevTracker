@@ -386,7 +386,7 @@ namespace DevTracker.Classes
             catch (Exception ex)
             {
             }
-            return p;// appName;
+            return p;
         }
 
         public void Dispose()
