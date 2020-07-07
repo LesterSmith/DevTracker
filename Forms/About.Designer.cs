@@ -47,7 +47,7 @@
             this.hhiImage1.Location = new System.Drawing.Point(5, 4);
             this.hhiImage1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.hhiImage1.Name = "hhiImage1";
-            this.hhiImage1.Size = new System.Drawing.Size(32, 32);
+            this.hhiImage1.Size = new System.Drawing.Size(31, 31);
             this.hhiImage1.TabIndex = 0;
             // 
             // label1
@@ -103,7 +103,7 @@
             this.panel1.Location = new System.Drawing.Point(516, 18);
             this.panel1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(47, 45);
+            this.panel1.Size = new System.Drawing.Size(48, 45);
             this.panel1.TabIndex = 5;
             // 
             // button1

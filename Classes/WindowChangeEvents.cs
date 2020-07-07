@@ -8,6 +8,7 @@ using System.Diagnostics;
 using BusinessObjects;
 using System.DirectoryServices.AccountManagement;
 using AppWrapper;
+using DevTrackerLogging;
 using System.ComponentModel;
 
 namespace DevTracker.Classes
@@ -244,7 +245,7 @@ namespace DevTracker.Classes
                     };
 
                     if (string.IsNullOrWhiteSpace(we.WindowTitle) || (we.AppName.ToLower() == "ssms" && we.WindowTitle.Contains("Microsoft Visual Studio")))
-                        Util.LogError($"WindowChangeEvents, SSMS Bad Project for Title: {we.WindowTitle}");
+                        _ = new LogError($"WindowChangeEvents, SSMS Bad Project for Title: {we.WindowTitle}", false, "WindowChangeEvents.WinEventProc");
 
                     Globals.WinEventQueue.Enqueue(
                         new WinEventProcesss
@@ -281,7 +282,7 @@ namespace DevTracker.Classes
                     }
                     catch (Exception ex)
                     {
-                        Util.LogError($"WindowChangeEvent, can't determine AppName: {ex.Message}");
+                        _ = new LogError($"WindowChangeEvent, can't determine AppName: {ex.Message}", false, "WindowChangeEvents.WinEventProc");
                         currentApp = "Unknown";
                     }
 
@@ -291,8 +292,13 @@ namespace DevTracker.Classes
                         ? gawtTitle : !string.IsNullOrWhiteSpace(mwTitle)
                         ? mwTitle : $"Unknown title from {currentApp}";
 
+                    if (Globals.LastWindowEvent.WindowTitle.StartsWith("Unknown"))
+                    {
+                        _ = new LogError($"WindowChangeEvent, Bad Title from Title: {title}, GetActiveWindowTitle= '{title}'", false, "WindowChangeEvents.WinEventProc");
+                    }
+
                     if (currentApp == "ssms" && title.Contains("Microsoft Visual Studio"))
-                        Util.LogError($"WindowChangeEvent, SSMS bad project from {title}");
+                        _ = new LogError($"WindowChangeEvent, SSMS bad project from {title}", false, "WindowChangeEvent.WinEventProc");
 
                     string displayName = Globals.DisplayName;
 
@@ -310,11 +316,6 @@ namespace DevTracker.Classes
                         UserDisplayName = displayName,
                         ITProjectID = string.Empty
                     };
-
-                    if (Globals.LastWindowEvent.WindowTitle.StartsWith("Unknown"))
-                    {
-                        Util.LogError($"WindowChangeEvent, Bad Title from Title: {title}, GetActiveWindowTitle={GetActiveWindowTitle()}");
-                    }
 
                     if (!Globals.WindowEventThreadRunning)
                     {

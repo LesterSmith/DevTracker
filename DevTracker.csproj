@@ -36,8 +36,13 @@
     <StartupObject>DevTracker.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AppWrapper">
+    <Reference Include="AppWrapper, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\DevTrkr DLLs\AppWrapper\bin\Debug\AppWrapper.dll</HintPath>
+    </Reference>
+    <Reference Include="HHIImage, Version=1.1.7482.17106, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\HHIImage\bin\HHIImage.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="System" />
@@ -55,7 +60,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\AppWrapperLocal.cs" />
     <Compile Include="Classes\CheckForProjectName.cs" />
     <Compile Include="Classes\CheckForWorkStationLocking.cs" />
     <Compile Include="Classes\DummyLockObject.cs" />
@@ -159,13 +163,13 @@
       <Project>{27f48f76-11be-4e53-a208-1081bcf546bf}</Project>
       <Name>DevProjects</Name>
     </ProjectReference>
+    <ProjectReference Include="..\DevTrkr DLLs\DevTrackerLogging\DevTrackerLogging.csproj">
+      <Project>{99b62566-4a12-45a3-9264-29563ed3784b}</Project>
+      <Name>DevTrackerLogging</Name>
+    </ProjectReference>
     <ProjectReference Include="..\DevTrkr DLLs\DevTrkrReports\DevTrkrReports.csproj">
       <Project>{23c9c59c-1ee6-47f3-b85e-da36deccf42e}</Project>
       <Name>DevTrkrReports</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\HHIImage\HHIImage.vbproj">
-      <Project>{18ae9580-6bac-4e88-9f31-5ce478d0111a}</Project>
-      <Name>HHIImage</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

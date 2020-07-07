@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
-
+using AppWrapper;
+using DevTrackerLogging;
 namespace DevTracker
 {
     static class Program
@@ -11,10 +12,17 @@ namespace DevTracker
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new DevTracker.Classes.WCTApplicationContext());
-            Application.Run(new Forms.MiscContainer());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                //Application.Run(new DevTracker.Classes.WCTApplicationContext());
+                Application.Run(new Forms.MiscContainer());
+            }
+            catch (Exception ex)
+            {
+                _ = new LogError(ex, false, "Program.Main");
+            }
 
         }
     }

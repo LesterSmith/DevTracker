@@ -5,6 +5,7 @@ using DataHelpers;
 using BusinessObjects;
 using DevTracker.Classes;
 using AppWrapper;
+using DevTrackerLogging;
 namespace DevTracker.Forms
 {
     public enum AddOrUpdate
@@ -50,7 +51,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.Options_Load");
             }
         }
         #endregion
@@ -125,7 +126,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.btnAddClick");
             }
         }
 
@@ -170,7 +171,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.btnUpdate_Click");
             }
         }
 
@@ -214,6 +215,7 @@ namespace DevTracker.Forms
                         LoadConfigOptions();
                         lbConfigOptions.SelectedIndex = 0;
                         LoadConfigOptionsControls(ConfigOptions[0]);
+                        lbConfigOptions.Enabled = true;
                         break;
                     case "tabDevProjects":
                         rows = hlpr.DeleteDevProjects(DevProjects[lbDevProjects.SelectedIndex].ID);
@@ -226,7 +228,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true,"Options.btnDelete_Click");
             }
         }
 
@@ -400,7 +402,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex,true);
+                _ = new LogError(ex,true, "Options.btnSave_Click");
             }
         }
 
@@ -450,7 +452,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.btnCancel_Click");
             }
         }
         private void LoadGeneralControls()
@@ -993,7 +995,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.lbApplications_SelectedChanged");
             }
         }
 
@@ -1043,7 +1045,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.tabControl1_SelectedIndexChanged");
             }
         }
 
@@ -1057,7 +1059,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.lblIDEMatches_SelectedIndexChanged");
             }
         }
 
@@ -1070,7 +1072,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.lblFileExxtensions_SelectedIndexChanged");
             }
         }
         private void lbConfigOptions_SelectedIndexChanged(object sender, EventArgs e)
@@ -1083,7 +1085,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "Options.lbConfigOptions_SelecctedIndexChanged");
             }
         }
 
@@ -1097,7 +1099,7 @@ namespace DevTracker.Forms
             }
             catch (Exception ex)
             {
-                Util.LogError(ex, true);
+                _ = new LogError(ex, true, "lbDevProjects_SelectedIndexChanged");
             }
         }
 

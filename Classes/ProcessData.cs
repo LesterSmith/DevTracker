@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AppWrapper;
+using DevTrackerLogging;
 using System.Diagnostics;
 
 namespace DevTracker.Classes
@@ -52,18 +53,34 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                Util.LogError($"WindowChangeEvent, can't determine AppName: {ex.Message}");
+                _ = new LogError($"WindowChangeEvent, can't determine AppName: {ex.Message}", false, "ProcessData.GetCurrentProcessData");
                 currentApp = "Unknown";
             }
 
-            var gawtTitle = GetActiveWindowTitle();
-            var mwTitle = p.MainWindowTitle;
+            string gawtTitle = string.Empty;
+            try
+            {
+                gawtTitle = GetActiveWindowTitle();
+            }
+            catch (Exception ex)
+            {
+            }
+
+            string mwTitle = string.Empty;
+            try
+            {
+                mwTitle = p.MainWindowTitle;
+
+            }
+            catch (Exception ex)
+            {
+            }
+
             var title = !string.IsNullOrWhiteSpace(gawtTitle)
                 ? gawtTitle : !string.IsNullOrWhiteSpace(mwTitle)
-                ? mwTitle : $"Unknown title from {currentApp}";
+                ? mwTitle : $"ProcessData.GetCurrentProcessData, Unknown title from {currentApp}";
 
             return Tuple.Create(currentApp, moduleName, title, hwnd);
-
         }
 
         public static string GetActiveWindowTitle()

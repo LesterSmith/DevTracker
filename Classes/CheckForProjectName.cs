@@ -4,6 +4,8 @@ using System.Diagnostics;
 using BusinessObjects;
 using DataHelpers;
 using AppWrapper;
+using DevTrackerLogging;
+using DevProjects;
 namespace DevTracker.Classes
 {
     /// <summary>
@@ -29,7 +31,7 @@ namespace DevTracker.Classes
 
             foreach (var ide in Globals.IDEMatches)
             {
-                if (!accessDenied && _currentApp.ToLower() == ide.AppName)
+                if (!accessDenied && _currentApp.ToLower() == ide.AppName.ToLower())
                 {
                     var pat = ide.Regex;
                     var m = Regex.Match(title, pat, RegexOptions.IgnoreCase | RegexOptions.ExplicitCapture);
@@ -54,7 +56,7 @@ namespace DevTracker.Classes
                             devPrjName = m.Groups[ide.RegexGroupName].Value;
 
                         if (devPrjName.StartsWith("Microsoft") && _currentApp == "ssms")
-                            Util.LogError($"CheckForProjectName, SSMS Invalid Project: 'Microsoft' from Title: { title}");
+                            _ = new LogError($"CheckForProjectName, SSMS Invalid Project: 'Microsoft' from Title: { title}", false, "CheckForProjectName.GetProjectName");
 
                         if (!string.IsNullOrWhiteSpace(ide.ProjNameReplaces))
                         {
@@ -65,6 +67,7 @@ namespace DevTracker.Classes
                             }
                         }
 
+                        // how do I know it is not the one we wan
                         // NOTE: new logic for IDEMatch objects that have AlternateProjName
                         // if it is not null, replace devPrjName with it b/c altho we found a project name
                         // it is not one we want, so make it what we want (probably the same as the unknown value)
@@ -101,19 +104,16 @@ namespace DevTracker.Classes
             // if at this point we did not find an idematch just an unknown window
             EndOfGenericCode:
 
-            // if we are writing this window, and devProjectName not set yet
+            // if devProjectName not set yet
             // see if a known project name is being worked on by a non IDE
-            if (doWriteDB)
+            // check to see if the window title contains a known project name
+            if (string.IsNullOrWhiteSpace(devPrjName))
             {
-                // check to see if the window title contains a known project name
-                if (string.IsNullOrWhiteSpace(devPrjName))
+                Tuple<string, string> prjObject = IsProjectInNonIDETitle(title);
+                if (prjObject != null)
                 {
-                    Tuple<string, string> prjObject = IsProjectInNonIDETitle(title);
-                    if (prjObject != null)
-                    {
-                        devPrjName = prjObject.Item1;
-                        syncId = prjObject.Item2;
-                    }
+                    devPrjName = prjObject.Item1;
+                    syncId = prjObject.Item2;
                 }
             }
 

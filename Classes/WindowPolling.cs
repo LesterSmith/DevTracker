@@ -2,6 +2,7 @@
 using System.Timers;
 using System.Diagnostics;
 using AppWrapper;
+using DevTrackerLogging;
 namespace DevTracker.Classes
 {
     public static class WindowPolling 
@@ -76,7 +77,7 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                Util.LogError(ex);
+                _ = new LogError(ex, false, "WindowPolling.Timer_Tick");
             }
         }
 

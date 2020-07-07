@@ -6,6 +6,7 @@ using DevProjects;
 using System.Diagnostics;
 using DataHelpers;
 using AppWrapper;
+using DevTrackerLogging;
 namespace DevTracker.Classes
 {
     /// <summary>
@@ -73,15 +74,14 @@ namespace DevTracker.Classes
                     && !string.IsNullOrWhiteSpace(projFileObject.IDEProjectExtension)
                     && projFileObject.IDEProjectExtension.Equals(ext))
                 {
-                    // yes, we are manipulating a development language project file
+                    // yes, we are manipulating a development language project or sln file
                     // therefore the path is where the project file is saved and
                     // by definition, the filename is the name of the project
                     fc.ProjectName = Path.GetFileNameWithoutExtension(fc.FullPath);
                     devPath = Path.GetDirectoryName(fc.FullPath);
-                    
+
                     // if devPath not in DevProjects path insert it, else update the pathname
-                    syncID = mp.CheckForInsertingNewProjectPath(
-                    new DevProjPath
+                    DevProjPath dpp = new DevProjPath
                     {
                         DevProjectName = fc.ProjectName,
                         DevProjectPath = devPath,
@@ -89,7 +89,19 @@ namespace DevTracker.Classes
                         DatabaseProject = ideMatch.IsDBEngine,
                         CountLines = projFileObject.CountLines,
                         ProjFileExt = projFileObject.IDEProjectExtension
-                    }, fc.FullPath);
+                    };
+                    dpp.DevSLNPath = mp.FindSLNFileFromProjectPath(dpp);
+                    dpp.SyncID = syncID = mp.CheckForInsertingNewProjectPath(dpp, fc.FullPath);
+
+                    // the .sln may or may not be in the project table at the time the
+                    // project is created, in fact it may never be there for a number of reasons,
+                    // e.g., DLL project, etc., but a project may get a .sln at later time
+                    // here we do not know whether the code above wrote to DevProjects
+                    if (ext.Equals("sln"))
+                    {
+                        mp.UpdateSLNPathInProject(dpp);
+                    }
+
 
                     //TODO: a hole in the logic when a project FOLDER is dropped, pasted
                     //NOTE: not necessarily true b/c if a project is not initially monitord
@@ -126,6 +138,8 @@ namespace DevTracker.Classes
                     // NOTE: changing logic here to something more reliable 04/17/2020
                     DevProjPath pp = mp.IsFileInADevProjectPath(fc.FullPath);
                     // if pp not null, we have a known project
+                    // **** and the following lines is not doing anything...
+                    // b/c the project is already in devprojects and ChkforInsert..will do nothing
                     if (pp != null)
                     {
                         fc.ProjectName = pp.DevProjectName;
@@ -146,13 +160,20 @@ namespace DevTracker.Classes
                         // found the .xxproj file so we are sure that we can check for inserting
                         // a new project in DevProjects table
                         Tuple<string, string, string> tuple = mp.GetProjectFromDevFileSave(fc.FullPath, Globals.NotableFiles, ext);
-                        if (tuple == null)
+                        if (tuple == null || string.IsNullOrWhiteSpace(tuple.Item1))
                         {
-                            Util.LogError($"FileAnalyzer Missing Data, Project: {fc.ProjectName}  Path: {devPath} FileFullPath: {fc.FullPath}");
+                            // remove next line b/c it is writing false positive problems, e.g.,
+                            // a .dll not written to a project path will log an error falsely 7/1/20
+                            //_ = new LogError($"FileAnalyzer Missing Data, Project: {fc.ProjectName}  Path: {devPath} FileFullPath: {fc.FullPath}", false, "FileAnalyzer.ctor");
                             goto TopOfCode;
                         }
                         else
                         {
+                            //NOTE: if devenv is installing something don't let it fool
+                            // us into creating a project
+                            if (fc.CurrentApp == "devenv" && tuple.Item2.ToLower().Contains("program files"))
+                                goto TopOfCode;
+
                             fc.ProjectName = tuple.Item1;
                             devPath = tuple.Item2;
                             syncID = mp.CheckForInsertingNewProjectPath(
@@ -217,7 +238,7 @@ namespace DevTracker.Classes
                     fc.ProjectName = pp.DevProjectName;
                     devPath = pp.DevProjectPath;
                     syncID = pp.SyncID;
-
+                    pp.CountLines = projFileObject.CountLines;
                     // we update files only here b/c we are not calling mp.CheckForInsertingProject
                     // as we do when we have an IDE above...
                     mp.UpdateProjectFiles(pp, fc.FullPath, new DHMisc());
@@ -227,7 +248,6 @@ namespace DevTracker.Classes
                 // in a known development path, else we would have ignored the file before getting here
                 // if devProject is not empty, update the windowevent so that the app that caused this
                 // FW event can be charged to the project 
-                //NOTE: **** if not running window events, skip this code
                 if (!string.IsNullOrWhiteSpace(devPath))
                 {
                     lock (Globals.LastWindowEvent)
@@ -237,7 +257,7 @@ namespace DevTracker.Classes
                             string.IsNullOrWhiteSpace(Globals.LastWindowEvent.DevProjectName))
                         {
                             Globals.LastWindowEvent.DevProjectName = fc.ProjectName;
-                            Globals.LastWindowEvent.SyncID = syncID;
+                            Globals.LastWindowEvent.SyncID = string.IsNullOrWhiteSpace(syncID) ? string.Empty : syncID;
                         }
                         else
                         {
@@ -253,7 +273,7 @@ namespace DevTracker.Classes
                             {
                                 // update the window event that was current when this file was modified
                                 // with the correct proj name so work on this file gets charged
-                                hlpr2.UpadateProjAndPathInWindowEvent(fc.CurrentWindowID, fc.ProjectName, syncID);
+                                hlpr2.UpadateProjAndPathInWindowEvent(fc.CurrentWindowID, fc.ProjectName, string.IsNullOrWhiteSpace(syncID) ? string.Empty : syncID);
                             }
                         }
                         //update syncid in window events if syncid is known
@@ -266,7 +286,7 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                Util.LogError(ex);
+                _ = new LogError(ex, false, "FileAnalyzer.ctor");
                 Globals.FileAnalyzerThreadRunning = false;
             }
         }

@@ -6,6 +6,7 @@ using DataHelpers;
 using BusinessObjects;
 using DevProjects;
 using AppWrapper;
+using DevTrackerLogging;
 namespace DevTracker.Classes
 {
     public class WindowEvents
@@ -78,7 +79,7 @@ namespace DevTracker.Classes
                 var syncId = string.Empty;
 
                 // We set some properties so the file watcher knows who is running
-                _currentApp = wep.MyWindowEvent.AppName;
+                _currentApp = wep.MyWindowEvent.AppName.ToLower();
 
                 bool writeDB = false;
 
@@ -132,7 +133,7 @@ namespace DevTracker.Classes
                     MaintainProject mp = new MaintainProject();
                     // bypass next line until we get fw debugged
                     if (string.IsNullOrWhiteSpace(wep.MyWindowEvent.SyncID))
-                        wep.MyWindowEvent.SyncID = mp.GetProjectSyncIDForProjectName(devPrjName, _currentApp);
+                        wep.MyWindowEvent.SyncID = mp.GetProjectSyncIDForProjectName(devPrjName); //, _currentApp);
 
                     // here we should update any WindowEvents that have been created by this appname
                     // and for this project w/o a syncid
@@ -148,23 +149,23 @@ namespace DevTracker.Classes
                     item.AppName = item.WindowTitle;
 
                 if (!string.IsNullOrWhiteSpace(item.DevProjectName) && item.DevProjectName.Equals("devenv"))
-                    Util.LogError($"WindowEvent, Bad Project Name of 'devenv' from Title: {item.WindowTitle}");
+                    _ = new LogError($"WindowEvent, Bad Project Name of 'devenv' from Title: {item.WindowTitle}", false, "WindowEvents.ctor");
 
                 if (ideMatchObject != null && devPrjName == "DevTracker" && ideMatchObject.AppName == "ssms")
-                    Util.LogError($"WindowEvents, 'Devtracker' should not be the project name for ssms, Title: {item.WindowTitle}");
+                    _ = new LogError($"WindowEvents, 'Devtracker' should not be the project name for ssms, Title: {item.WindowTitle}", false, "WindowEvent.ctor");
 
                 //NOTE: 4 / 27 / 2020 discontinued this doing anything...except writing bad data notes
                 // Window events does not have devpath and therefore is not qualified to insert a project
                 if (ideMatchObject != null && !ideMatchObject.IsIde && !devPrjName.ToLower().Contains(".sql"))
                 {
                     // if next line true
-                    if ((!string.IsNullOrWhiteSpace(ideMatchObject.AlternateProjName) && devPrjName == ideMatchObject.AlternateProjName) || devPrjName == ".")
-                        Util.LogError($"WindowEvents, Bad Project Name: {devPrjName} from Title: {item.WindowTitle}");
+                    if (/*(!string.IsNullOrWhiteSpace(ideMatchObject.AlternateProjName) && devPrjName == ideMatchObject.AlternateProjName) || */devPrjName == ".")
+                        _ = new LogError($"WindowEvents, Bad Project Name: {devPrjName} from Title: {item.WindowTitle}", false, "WindowEvents.ctor");
                     else
                     {
                         // this is a check for convoluted name going to DevProjectName
                         if ("Connect.to_Repor._DevTrack.".Contains(devPrjName) || devPrjName.EndsWith("."))
-                            Util.LogError($"WindowEvents bad project name = {devPrjName} from Title: {item.WindowTitle}");
+                            _ = new LogError($"WindowEvents bad project name = {devPrjName} from Title: {item.WindowTitle}", false, "WindowEvents.ctor");
 
                         //NOTE: we should not set an unknown value in the devproject table
                         // the way the sproc is written, this call will insert a new project with unknown path
@@ -173,25 +174,48 @@ namespace DevTracker.Classes
                         // if this is the way a project gets created in DevProjects, it will only get the correct path
                         // from the save of a project file, which only get done when a new project is created
                         else if (string.IsNullOrWhiteSpace(devPrjName) || string.IsNullOrWhiteSpace(ideMatchObject.UnknownValue))
-                            Util.LogError($"WindowEvents, Missing Data, Project: {devPrjName}  Path: {ideMatchObject.UnknownValue} from Title: {item.WindowTitle}");
+                            _ = new LogError($"WindowEvents, Missing Data, Project: {devPrjName}  Path: {ideMatchObject.UnknownValue} from Title: {item.WindowTitle}", false, "WindowEvents.ctor");
                         else
-                            // Not sure we want to do this here anymore since
-                            // determining a project name is not guaranteed to be
-                            // correct as it is in the fileanalyzer
+                        {
+
+                            // we create projects for database servers here for two reasons
+                            // 1) they don't have a path
+                            // 2) they will get no files saved  with any relation to a path so FileAnalyzer won't create the project
+
                             // when development of DevTracker was begun, windowevents
                             // was the only way we had of possibly getting the project
                             // name, but it did not, nor does it now have a way to get
                             // the path.  FileAnalyzer on the other hand has an exact way of
                             // deriving the path to the projectFile .xxproj so Les has made
                             // the decision of stopping what is at best doing half the job
-                            Debug.WriteLine($"**** Would have checked for writing {devPrjName} to DevProjects");
-                        // CheckForInsertingNewProjectPath(devPrjName, ideMatchObject.UnknownValue, Environment.UserName, Environment.MachineName, ideMatchObject.AppName, ideMatchObject.IsDBEngine);
+                            // except for database projects
+                            //Debug.WriteLine($"**** Would have checked for writing {devPrjName} to DevProjects");
 
+                            if (ideMatchObject != null && ideMatchObject.IsDBEngine && devPrjName != ideMatchObject.AlternateProjName)
+                            {
+                                var mp = new MaintainProject();
+                                DevProjPath dpp = new DevProjPath
+                                {
+                                    DevProjectName = devPrjName,
+                                    DevProjectPath = ideMatchObject.UnknownValue,
+                                    IDEAppName = item.AppName,
+                                    DatabaseProject = ideMatchObject.IsDBEngine,
+                                    CountLines = false,
+                                    ProjFileExt = "sql",
+                                    DevSLNPath = string.Empty,
+                                    GitURL = devPrjName,
+                                    Machine = Environment.MachineName,
+                                    UserName = Environment.UserName,
+                                    CreatedDate = DateTime.Now
+                                };
+                                item.SyncID = mp.CheckForInsertingNewProjectPath(dpp);
+                            }
+                        }
                     }
                 }
 
                 if (item.AppName == "ssms" && item.DevProjectName == "Microsoft")
-                    Util.LogError($"WindowEvents, Bad Project name 'Microsoft' from Title: {item.WindowTitle}");
+                    _ = new LogError($"WindowEvents, Bad Project name 'Microsoft' from Title: {item.WindowTitle}", false, "WindowEvents.ctor");
                 item.DevProjectName = devPrjName;
                 hlpr = new DHWindowEvents();
                 int rows = hlpr.InsertWindowEvent(item);
@@ -200,7 +224,7 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                Util.LogError(ex);
+                _ = new LogError(ex, false, "WindowEvents.ctor");
             }
             goto TopOfCode;
         }
