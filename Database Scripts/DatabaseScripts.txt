@@ -75,9 +75,10 @@ GO
 
 
 
+USE [DevTrkr]
+GO
 
-
-/****** Object:  Table [dbo].[ProjNameMatches]    Script Date: 2/22/2020 12:26:27 PM ******/
+/****** Object:  Table [dbo].[ProjNameMatches]    Script Date: 7/9/2020 3:17:58 PM ******/
 SET ANSI_NULLS ON
 GO
 
@@ -95,10 +96,12 @@ CREATE TABLE [dbo].[ProjNameMatches](
 	[AppName] [varchar](50) NOT NULL,
 	[ProjNameReplaces] [varchar](max) NULL,
 	[ProjNameConcat] [varchar](255) NULL,
+	[ConcatChar] [varchar](50) NULL,
 	[IsIde] [bit] NULL,
 	[Description] [varchar](50) NULL,
 	[AlternateProjName] [varchar](255) NULL,
-	[IsDBEngine] bit Null
+	[Sequence] [int] NULL,
+	[IsDBEngine] [bit] NULL,
  CONSTRAINT [PK_ProjNameMatches] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC
@@ -109,6 +112,7 @@ GO
 
 SET ANSI_PADDING OFF
 GO
+
 
 
 
@@ -2237,16 +2241,6 @@ GO
 
 
 
---**** Table Population
-insert into DevTrkr..ProjNameMatches
-(ID, Regex, Unknownvalue, appname,  ProjNameReplaces, RegexGroupName)
-Values
-(newid(),'(?<PrjName>.*?)(?<spacer> - )*Microsoft Visual Studio|Microsoft Visual Studio',	'VSUnknown',	'devenv',	0,	'(Running)|(Debugging)',	'PrjName')
-
-insert into DevTrkr..ProjNameMatches
-(ID, Regex, Unknownvalue, appname,  ProjNameReplaces, RegexGroupName)
-Values
-(newid(),'^(?<FileName>.*?) - (?<PrjName>.*?) - Visual Studio Code|Welcome - Visual Studio Code|Open Folder',	'vscodeUnknown',	'Code',	1,	NULL, 'PrjName')
 
 
 --**** User Defined functions
@@ -2308,4 +2302,347 @@ BEGIN
     RETURN
 END
 GO
+
+--**** Table Population
+
+--**** Values to populate Table DevTrkr..ProjNameMatches ****
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('5986e00f-09ec-42ed-829c-4094b28423f6', '^(?<FileName>.*?) - (?<PrjName>.*?) - Visual Studio Code', 'PrjName', 'vscodeUnknown', 'code', '', '', '', 1, 'Microsoft VS Code', '', 3, 0)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('97c5b0ef-d33b-40bb-887f-56694e999838', '(?<Server>[\w+\-]*)\.(?<DBName>master)', 'Server', 'ssmsUnknown', 'ssms', null, 'Server|DBName', '.', 0, 'SQL Server Management System', 'ssmsUnknown', 2, 1)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('879c579a-db9c-4be4-aa3a-56852ac0e674', '(?<PrjName>.*?)(?<spacer> - )*Microsoft Visual Studio|Microsoft Visual Studio', 'PrjName', 'VSUnknown', 'devenv', '(Running)|(Debugging)', null, null, 1, 'Microsoft Visual Studio', null, 4, null)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('e86b2197-4409-44ad-ba5e-56a0969f10c6', 'Open Folder', 'PrjName', 'vscodeUnknown', 'code', '', '', '', 1, 'Microsoft VS Code', '', 1, 0)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('4b3bb607-a0a4-4553-b898-92ec6d8dbd95', '(?<PrjName>not connected)', 'PrjName', 'ssmsUnknown', 'ssms', null, null, null, 0, 'SQL Server Management System', 'ssmsUnknown', 1, 1)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('5e6a3df7-511c-435c-9af2-988d76175f59', '^(?<PrjName>Microsoft SQL Server Management Studio)', 'PrjName', 'ssmsUnknown', 'ssms', null, null, null, null, 'SQL Server Management System', 'ssmsUnknown', 4, 1)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('28d06dec-3ee2-4cb6-ac1b-9f04e84f1aa2', '(?<PrjName>Save File As)', 'PrjName', 'ssmsUnknown', 'ssms', null, null, null, 0, 'SQL Server', 'ssmsUnknown', 5, 1)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('ab970323-c4fb-4cec-8e78-b91c02cdac66', 'Welcome - Visual Studio Code', 'PrjName', 'vscodeUnknown', 'code', '', '', '', 1, 'Microsoft VS Code', '', 2, 0)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('d632809d-0624-4044-8fe1-be87a28a63a2', '^Reference Manager - (?<PrjName>.*$)', 'PrjName', 'VSUnknown', 'devenv', null, null, null, 1, 'Microsoft Visual Studio', null, 3, null)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('4d3da4e4-315a-4bcf-aaa2-c7d8122adc01', '(?<PrjName>Connect to Database Engine)', 'PrjName', 'ssmsUnknown', 'ssms', null, null, null, null, 'SQL Server Management System', 'ssmsUnknown', 3, 1)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('c05ee7ca-0af9-48ac-b246-d0c50f63bb25', '^Add Existing Item - (?<PrjName>.*$)', 'PrjName', 'VSUnknown', 'devenv', null, null, null, 1, 'Microsoft Visual Studio', null, 1, null)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('45c47858-a5f0-484a-9e1a-e68a059c4b75', '^Add New Item - (?<PrjName>.*$)', 'PrjName', 'VSUnknown', 'devenv', null, null, null, 1, 'Microsoft Visual Studio', null, 2, null)
+
+Insert into DevTrkr..ProjNameMatches
+(ID, Regex, RegexGroupName, UnknownValue, AppName, ProjNameReplaces, ProjNameConcat, ConcatChar, IsIde, Description, AlternateProjName, Sequence, IsDBEngine)
+Values
+('f5b77036-361b-422f-944f-fdb6f8d0f513', '^(?<FileName>[\w+\-]*.sql)(?<dash1>\s+-\s+)(?<Server>[\w+\-]*)(?<delim>\.)*(?<DBName>[\w+\-]*)*\s+', 'Server', 'ssmsUnknown', 'ssms', null, 'Server|DBName', '.', 0, 'SQL Server Management System', null, 6, 1)
+
+
+--**** Values to populate Table DevTrkr..ConfigOptions ****
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('0261b04d-6f31-49c8-9c73-080736079fee', 'RECORDAPPS', 'S', 'A to record all apps time or S to record only specific Notable apps')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('02ad90c2-eb7a-4e48-ae48-0d1cbbbdf6fa', 'IDEPROJECTFILEEXTENSION', 'vbproj', 'Development Project File Extenion for VB.NET')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('35d759e2-b251-4904-97a2-211b52417a04', 'IDEPROJECTFILEEXTENSION', 'csproj', 'Development Project File Extenion for C#')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('4bd2f0a1-83e6-44ea-b7a3-27e3c5b2baa0', 'FILEWATCHERDIRECTORY', 'DESKTOP-954MMSO|C:\', 'Directory for FileWatcher to watch. Machine|Path,Path... (one row per machine required')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('1de9d003-c8ee-4034-9394-28cc181d9baa', 'IDEPROJECTFILEEXTENSION', 'fsxproj', 'Development Project File Extenion for F#')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('a8d417ec-717c-4dea-be71-3493d08d7d3d', 'WINDOWTYPEEVENTS', '1', '0 => SetWinEventHook for events (runs slow), 1 => Poll Windows on timer (runs faster)')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('5e1e9222-fd76-4c73-be35-70120190acb6', 'CALENDARQUERIEDTIME', '07/08/2020 00:00:00', 'Datetime that the Outlook Calender was last queried')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('d43db70b-1cdb-4a91-98e6-7778f74f6ab3', 'RECORDFILES', 'S', 'S for Notable Files, N for No Files recorded, A for All Files (currently not used, we are only recording development files by project)')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('434f922c-a1f3-4949-b432-802ae30e8874', 'IDEPROJECTFILEEXTENSION', 'vcproj', 'Development Project File Extenion for C++ (early)')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('8774f331-da20-4740-8425-859e53c6f81d', 'ERRORLOGRETENTIONDAYS', '15', 'Days to retain error logs')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('350e195a-64ef-4864-b8bf-b000a42b2405', 'IDEPROJECTFILEEXTENSION', 'vcxproj', 'Development Project File Extenion for C++ (late)')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('ee347821-f107-4b7a-a7c5-c06878098128', 'POLLINGTIMEINTERVAL', '100', 'Polling time in ms when WINDOWTYPEEVENTS = 1')
+
+Insert into DevTrkr..ConfigOptions
+(ID, Name, Value, Description)
+Values
+('99635b7f-28d7-41d1-bd7a-c7eabe99c23d', 'CACHEEXPIRATIONTIME', '5', 'Time in minutes to refresh cached object')
+
+
+--**** Values to populate Table DevTrkr..NotableApplications ****
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('3dd7bc9d-d5f8-4bc1-834f-0e2302450910', 'iexplore', 'Internet Explorer', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('7f9702bd-4fdd-4a99-b617-10d365d8c751', 'outlook', 'OUTLOOK.exe', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('36edeaaa-cd2c-4b9d-9703-12454e7bbcba', 'ComputerLocked', 'ComputerLocked', '')
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('b15c08e9-ee83-413b-b50c-26e3463549fc', 'wordpad', 'WordPad', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('9ee201f8-4c7c-4006-b69b-2eb443b1a7d8', 'RegexSuite', 'Regular Expression Tester', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('ed9f3d87-e5b4-4bc1-ab18-31d05fef4340', 'chrome', 'Chrome', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('bb6eee37-aabf-4944-8e28-5bfa5707b37e', 'winword', 'Microsoft Word', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('de2dbb9a-a273-4eae-82db-701a3ac862c4', 'notepad++', 'NotePad++', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('564f10ca-795d-47d2-a758-706331b0d39e', 'ssms', 'SSMS', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('8e4ba545-f123-416f-8a79-7d04f1d67ccc', 'notepad', 'NotePad', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('6d168119-572a-454e-bd13-8470775921c0', 'excel', 'Microsoft Excel', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('2143c7bd-5970-493f-839a-a3000eb41299', 'LockApp', 'LockApp', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('8c88e62c-4300-4a80-9adc-c0780ce20144', 'devenv', 'Visual Studio', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('01abe0a4-fc16-4e53-a1b6-dee76d0a2620', 'VISIO', 'VISIO', null)
+
+Insert into DevTrkr..NotableApplications
+(ID, AppName, AppFriendlyName, InterestingTitle)
+Values
+('8237569e-d0f4-4660-b757-eab3f6506762', 'Code', 'Visual Studio Code', null)
+
+
+--**** Values to populate Table DevTrkr..NotableFileTypes ****
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('b083c675-1c01-47cc-a362-07913b0afb25', 'gif', '5/29/2019 2:36:26 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('7eb845dc-ea25-4558-8a2c-0d54f785e5bd', 'h', '3/23/2020 1:00:00 PM', 'vcxproj|vcproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('bb79f1e2-76e3-4470-8e54-109490482afb', 'vb', '5/29/2019 2:34:52 PM', 'vbproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('dc5a8dfb-d23a-4bb8-aefc-126c2c6f5922', 'dll', '1/13/2020 3:08:46 PM', 'csproj|vbproj||vcproj|vcxproj|fsproj', null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('5ee488b4-5716-4e80-a088-181adc8f1fef', 'cs', '5/29/2019 2:34:10 PM', 'csproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('6a422143-c698-4642-9bea-1f522251b38e', 'xlsx', '5/29/2019 2:38:14 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('6a1f4407-361b-496b-b395-294cd803a93a', 'sln', '5/29/2019 2:36:47 PM', 'sln', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('4eb5dfb5-8c4a-4e58-be32-3c94c6cd183b', 'csproj', '5/29/2019 2:35:10 PM', 'csproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('e9f3836f-2b13-4ce5-8389-4a4903bf237d', 'xlst', '5/29/2019 2:38:32 PM', null, 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('bb6f1c76-ca91-413f-89fd-4fc1c8195265', 'bmp', '5/29/2019 2:38:49 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('55a4c631-a3a3-4e51-acdc-514e5fd24c20', 'exe', '1/13/2020 3:08:35 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('30e46a3c-b136-46c0-a976-5785a023a267', 'xls', '5/29/2019 2:38:08 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('edfc7698-aa29-455d-89a5-7bc397282e07', 'cpp', '3/23/2020 1:00:00 PM', 'vcxproj|vcproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('6656677c-31d4-4596-ac13-7ee91e518698', 'txt', '5/29/2019 2:35:38 PM', null, 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('ea7fa27e-b881-4e8a-b5e8-7efed6fff3f2', 'vbproj', '5/29/2019 2:35:26 PM', 'vbproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('3d8f3ee5-8772-4261-8e84-87df0b0aa5e9', 'xml', '5/29/2019 2:37:32 PM', null, 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('e5b17cfd-54bc-4092-999c-94a07792b1fb', 'img', '5/29/2019 2:36:13 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('c02ba9f3-77e1-49ed-aaea-a95bb35c4197', 'doc', '5/29/2019 2:37:47 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('6c419307-21ba-46dd-a3fc-af53ddabec8e', 'ico', '5/29/2019 2:37:04 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('759737b1-0985-4831-a4a2-bd934ba73df8', 'rgx', '2/27/2020 12:48:34 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('480d5c71-b7a6-47e2-9293-d510caffd307', 'fs', '5/29/2019 2:38:49 PM', 'fsproj', 1)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('98ab7e1d-6e97-4026-81a2-d80e53c69d82', 'docx', '5/29/2019 2:37:53 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('7defd831-31db-47c6-a451-e3aa198c96fe', 'jpg', '5/29/2019 2:37:15 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('d0d7994f-6f78-4c0b-a55b-f7c46372ff87', 'vsd', '7/6/2020 4:10:01 PM', null, null)
+
+Insert into DevTrkr..NotableFileTypes
+(ID, Extension, CreatedDate, IDEProjectExtension, CountLines)
+Values
+('863b45c0-a327-468e-bb2d-f80be438b204', 'config', '5/29/2019 2:36:01 PM', 'csproj|vbproj||vcproj|vcxproj|fsproj', 1)
 
