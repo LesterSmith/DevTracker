@@ -124,6 +124,7 @@ namespace DevTracker.Forms
         {
             //Cleanup so that the icon will be removed when the application is closed
             TrayIcon.Visible = false;
+            TrayIcon.Dispose();
         }
 
         private void TrayIcon_DoubleClick(object sender, EventArgs e)

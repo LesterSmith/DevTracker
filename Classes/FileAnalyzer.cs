@@ -102,13 +102,6 @@ namespace DevTracker.Classes
                         mp.UpdateSLNPathInProject(dpp);
                     }
 
-
-                    //TODO: a hole in the logic when a project FOLDER is dropped, pasted
-                    //NOTE: not necessarily true b/c if a project is not initially monitord
-                    // by DevTracker, any files created before that and never saved again really
-                    // should not be in the Project Detail report b/c there is no time charged b/c
-                    // of those file anyway.  Showing file code lines for which there is no time
-                    // will by definition skew the cost of a code line down...
                     // since project files (.cs,.vb, etc.) could be created before
                     // the project file (.xxproj), now that we know for sure the
                     // name and path, update all the files that may be missing them
@@ -171,7 +164,7 @@ namespace DevTracker.Classes
                         {
                             //NOTE: if devenv is installing something don't let it fool
                             // us into creating a project
-                            if (fc.CurrentApp == "devenv" && tuple.Item2.ToLower().Contains("program files"))
+                            if ((fc.CurrentApp == "devenv" && tuple.Item2.ToLower().Contains("program files")) || tuple.Item1.ToLower().Contains("install"))
                                 goto TopOfCode;
 
                             fc.ProjectName = tuple.Item1;
@@ -233,6 +226,13 @@ namespace DevTracker.Classes
                     DevProjPath pp = mp.IsFileInADevProjectPath(fc.FullPath);
                     if (pp == null)
                         goto TopOfCode;
+
+                    // if this is a .sln file, check for updating the sln path in pp
+                    if (ext == "sln" && string.IsNullOrWhiteSpace(pp.DevSLNPath))
+                    {
+                        pp.DevSLNPath = Path.GetDirectoryName(fc.FullPath);
+                        mp.UpdateSLNPathInProject(pp);
+                    }
 
                     // yes, this file is project file of a known DevProjects project
                     fc.ProjectName = pp.DevProjectName;
