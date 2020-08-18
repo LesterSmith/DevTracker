@@ -18,13 +18,12 @@ namespace DevTracker.Classes
                 Interval = 30
             };
 
-            //NOTE WinEventProcess Change
-            // set up a queue for WindowChangeEvent to use
             Globals.WinEventQueue = new Queue<BusinessObjects.WinEventProcesss>();
             Globals.FileChangeQueue = new Queue<FileChange>();
             Globals.SyncLockObject = new DummyLockObject();
             Globals.FilesLockObject = new DummyLockObject();
 
+            // Load cached data which is expected to be in memory for fast access
             SetupCachedDatabaseData();
 
             // start up window change event tracking
@@ -53,6 +52,9 @@ namespace DevTracker.Classes
                 Globals.IDEMatches = hlpr.GetProjectNameMatches();
                 Globals.NotableApplications = hlpr.GetNotableApplications();
                 Globals.ConfigOptions = hlpr.GetConfigOptions();
+
+                AppWrapper.AppWrapper.UserPermissionLevel = hlpr.GetCurrentUserPermissionLevel(Environment.UserName);
+
                 //NOTE: ProjectList will grow so large not feasible to maintain in cache
                 // Also, only used on occassion, so removing 6/2/2020
                 //Globals.ProjectList = hlpr.GetDevProjects(Environment.UserName, Environment.MachineName);

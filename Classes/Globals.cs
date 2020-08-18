@@ -36,6 +36,7 @@ namespace DevTracker.Classes
         public static List<IDEMatch> IDEMatches { get; set; }
         public static List<NotableApplication> NotableApplications { get; set; }
         public static List<NotableFileExtension> NotableFiles { get; set; }
+
         // Since we now save only development files to ProjectFiles Table,
         // the FileSaveOption had to do with FileActivity Table which is no longer used
         // So the FilesToSave property is no longer needed

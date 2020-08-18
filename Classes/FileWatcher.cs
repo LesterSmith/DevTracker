@@ -6,6 +6,7 @@ using System.IO;
 using BusinessObjects;
 using DataHelpers;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 namespace DevTracker.Classes
 {
     public enum FWType
@@ -179,7 +180,9 @@ namespace DevTracker.Classes
             try
             {
                 // if a background windows process like VS is saving temp files, ignore it
-                if (fileName.ToLower().Contains($"\\users\\{Environment.UserName}\\"))
+                if (fileName.ToLower().Contains($"\\users\\{Environment.UserName}\\") ||
+                    fileName.ToLower().Substring(3).StartsWith("windows") ||
+                    fileName.ToLower().Substring(3).StartsWith("program"))
                     return false;
 
                 var ext = Path.GetExtension(fileName);
@@ -191,6 +194,7 @@ namespace DevTracker.Classes
                     if (fileName.ToLower().EndsWith(@"\.git\config"))
                         return true;
                 }
+                
                 var o = Globals.NotableFiles.Find(x => x.Extension == ext);
                 return o != null;
             }

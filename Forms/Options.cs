@@ -5,6 +5,9 @@ using DataHelpers;
 using BusinessObjects;
 using DevTracker.Classes;
 using AppWrapper;
+using System.Text;
+using System.Security.Cryptography;
+using System.IO;
 using DevTrackerLogging;
 namespace DevTracker.Forms
 {
@@ -13,6 +16,7 @@ namespace DevTracker.Forms
         Add,
         Update
     }
+
     public partial class Options : Form
     {
         #region ..ctor
@@ -24,13 +28,18 @@ namespace DevTracker.Forms
         #endregion
 
         #region public and private members
+        private const string Key = "SecureAutomatedEndToEndP";
+        private const string IV = "SAEPNO01";
         private bool _isDirty = false;
-        List<NotableApplication> AppList = new List<NotableApplication>();
-        List<IDEMatch> IDEMatches { get; set; }
-        List<NotableFileExtension> NotableFiles { get; set; }
-        List<ConfigOption> ConfigOptions { get; set; }
-        List<DevProjPath> DevProjects { get; set; }
-        private AddOrUpdate _addUpdate = AddOrUpdate.Add;
+        private List<NotableApplication> AppList = new List<NotableApplication>();
+        private List<IDEMatch> IDEMatches { get; set; }
+        private List<NotableFileExtension> NotableFiles { get; set; }
+        private List<ConfigOption> ConfigOptions { get; set; }
+        private List<DevProjPath> DevProjects { get; set; }
+        private List<ProjectSync> ProjectSyncs { get; set; }
+
+        private AddOrUpdate AddUpdate { get; set; }
+        List<User> Users { get; set; }
         #endregion
 
         #region form load
@@ -38,6 +47,7 @@ namespace DevTracker.Forms
         {
             try
             {
+                AddUpdate = AddOrUpdate.Add;
                 Startup.SetupCachedDatabaseData();
                 LoadConfigOptions(); // must be first, others depend on ConfigOptions
                 LoadGeneralOptions();
@@ -46,6 +56,8 @@ namespace DevTracker.Forms
                 LoadPermissions();
                 LoadIDEMatches();
                 LoadDevProjects();
+                LoadProjectSyncs();
+
                 EnableDisableControls(false, "tabGeneral");
                 _isDirty = false;
             }
@@ -54,6 +66,8 @@ namespace DevTracker.Forms
                 _ = new LogError(ex, true, "Options.Options_Load");
             }
         }
+
+
         #endregion
 
         #region button events
@@ -61,7 +75,7 @@ namespace DevTracker.Forms
         {
             try
             {
-                _addUpdate = AddOrUpdate.Add;
+                AddUpdate = AddOrUpdate.Add;
                 switch (tabControl1.SelectedTab.Name)
                 {
                     case "tabGeneral":
@@ -82,7 +96,8 @@ namespace DevTracker.Forms
                         break;
                     case "tabPermissions":
                         EnableDisableControls(true, tabControl1.SelectedTab.Name);
-
+                        ClearTabPermissionsControls();
+                        lvUsers.Enabled = false;
                         break;
                     case "tabMatchObjects":
                         EnableDisableControls(true, tabControl1.SelectedTab.Name);
@@ -119,6 +134,10 @@ namespace DevTracker.Forms
                         txtDevProjectCompletedDate.Clear();
                         lbDevProjects.Enabled = false;
                         break;
+                    case "tabProjectSyncs":
+                        ClearProjectSyncsControls();
+                        lvProjectSyncs.Enabled = false;
+                        break;
                 }
                 btnCancel.Enabled = true;
                 btnSave.Enabled = true;
@@ -134,7 +153,7 @@ namespace DevTracker.Forms
         {
             try
             {
-                _addUpdate = AddOrUpdate.Update;
+                AddUpdate = AddOrUpdate.Update;
                 switch (tabControl1.SelectedTab.Name)
                 {
                     case "tabGeneral":
@@ -151,7 +170,7 @@ namespace DevTracker.Forms
                         break;
                     case "tabPermissions":
                         EnableDisableControls(true, tabControl1.SelectedTab.Name);
-
+                        lvUsers.Enabled = false;
                         break;
                     case "tabMatchObjects":
                         EnableDisableControls(true, tabControl1.SelectedTab.Name);
@@ -164,6 +183,12 @@ namespace DevTracker.Forms
                     case "tabDevProjects":
                         EnableDisableControls(true, tabControl1.SelectedTab.Name);
                         lbDevProjects.Enabled = false;
+                        break;
+                    case "tabProjectSyncs":
+                        // only allow update of these controls, not all on this tab
+                        txtProjectCount.Enabled = true; 
+                        txtProjectSyncGitUrl.Enabled = true;
+                        lvProjectSyncs.Enabled = false;
                         break;
                 }
                 btnCancel.Enabled = true;
@@ -202,7 +227,8 @@ namespace DevTracker.Forms
                         LoadFilesControls();
                         break;
                     case "tabPermissions":
-
+                        rows = hlpr.DeletePermissions(Users[lvUsers.SelectedItems[0].Index]);
+                        LoadPermissions();
                         break;
                     case "tabMatchObjects":
                         rows = hlpr.DeleteProjNameMatches(IDEMatches[lbIDEMatches.SelectedIndex].ID);
@@ -223,6 +249,11 @@ namespace DevTracker.Forms
                         lbDevProjects.SelectedIndex = 0;
                         LoadDevProjectsControls(DevProjects[0]);
                         break;
+                    case "tabProjectSyncs":
+                        rows = hlpr.DeleteProjectSync(ProjectSyncs[lvProjectSyncs.SelectedItems[0].Index]);
+                        LoadProjectSyncs();
+                        lvProjectSyncs.Items[0].Selected = true;
+                        break;
                 }
 
             }
@@ -232,10 +263,54 @@ namespace DevTracker.Forms
             }
         }
 
-        private void ResetButtonsAfterSave()
+        private void btnCancel_Click(object sender, EventArgs e)
         {
-            SetButtonsOnTabChange();
-
+            try
+            {
+                switch (tabControl1.SelectedTab.Name)
+                {
+                    case "tabGeneral":
+                        LoadGeneralControls();
+                        break;
+                    case "tabApplications":
+                        LoadApplicationControls(lbApplications.SelectedIndex);
+                        lbApplications.Enabled = true;
+                        break;
+                    case "tabFiles":
+                        LoadFilesControls();
+                        lbFileExtensions.Enabled = true;
+                        break;
+                    case "tabPermissions":
+                        LoadPermissionControls(lvUsers.SelectedItems[0].Index);
+                        lvUsers.Enabled = true;
+                        break;
+                    case "tabMatchObjects":
+                        var m = IDEMatches[lbIDEMatches.SelectedIndex];
+                        LoadIDEMatchesControls(m);
+                        lbIDEMatches.Enabled = true;
+                        break;
+                    case "tabConfigOptions":
+                        var item = ConfigOptions[lbConfigOptions.SelectedIndex];
+                        LoadConfigOptionsControls(item);
+                        lbConfigOptions.Enabled = true;
+                        break;
+                    case "tabDevProjects":
+                        var itemDP = DevProjects[lbDevProjects.SelectedIndex];
+                        LoadDevProjectsControls(itemDP);
+                        lbDevProjects.Enabled = true;
+                        break;
+                    case "tabProjectSyncs":
+                        LoadProjectSyncs();
+                        lvProjectSyncs.Enabled = true;
+                        break;
+                }
+                SetButtonsOnTabChange();
+                _isDirty = false;
+            }
+            catch (Exception ex)
+            {
+                _ = new LogError(ex, true, "Options.btnCancel_Click");
+            }
         }
         private void btnSave_Click(object sender, EventArgs e)
         {
@@ -281,7 +356,7 @@ namespace DevTracker.Forms
                         }
                         hlpr = new DHMisc();
                         var oApp = AppList[lbApplications.SelectedIndex];
-                        if (_addUpdate == AddOrUpdate.Add)
+                        if (AddUpdate == AddOrUpdate.Add)
                             oApp.ID = Guid.NewGuid().ToString();
                         oApp.AppName = txtAppName.Text;
                         oApp.AppFriendlyName = txtAppFriendlyName.Text;
@@ -302,7 +377,7 @@ namespace DevTracker.Forms
                         ext.Extension = txtExtension.Text;
                         ext.IDEProjectExtension = txtProjectFileExtension.Text;
                         ext.CountLines = chkCountLines.Checked;
-                        if (_addUpdate == AddOrUpdate.Add)
+                        if (AddUpdate == AddOrUpdate.Add)
                             ext.ID = Guid.NewGuid().ToString();
                         hlpr = new DHMisc();
                         hlpr.InsertUpdateNotableFileTypes(ext);
@@ -313,6 +388,30 @@ namespace DevTracker.Forms
                         SetButtonsOnTabChange();
                         break;
                     case "tabPermissions":
+                        if (!ValidateTabPermissions())
+                        {
+                            DisplayValidationErrors();
+                            return;
+                        }
+                        User pm;
+                        if (AddUpdate == AddOrUpdate.Add)
+                        {
+                            pm = new User
+                            {
+                                ID = Guid.NewGuid().ToString()
+                            };
+                        }
+                        else
+                        pm = Users[lvUsers.SelectedItems[0].Index];
+                        pm.FirstName = txtFirstName.Text;
+                        pm.LastName = txtLastName.Text;
+                        pm.UserName = txtUserName.Text;
+                        pm.PermissionLevel = cbPermissionLevel.Text;
+                        pm.UpdatedBy = Environment.UserName;
+                        hlpr = new DHMisc();
+                        hlpr.InsertUpdateUser(pm);
+                        LoadPermissions();
+                        SetButtonsOnTabChange();
                         break;
                     case "tabMatchObjects":
                         if (!ValidateTabIDEMatches())
@@ -322,7 +421,7 @@ namespace DevTracker.Forms
                         }
 
                         var ide = IDEMatches[lbIDEMatches.SelectedIndex];
-                        if (_addUpdate == AddOrUpdate.Add)
+                        if (AddUpdate == AddOrUpdate.Add)
                             ide.ID = Guid.NewGuid().ToString();
                         ide.AlternateProjName = txtMatchAlternateProjectName.Text;
                         ide.Regex = txtMatchRegex.Text;
@@ -355,7 +454,7 @@ namespace DevTracker.Forms
 
                         hlpr = new DHMisc();
                         var co = ConfigOptions[lbConfigOptions.SelectedIndex];
-                        if (_addUpdate == AddOrUpdate.Add)
+                        if (AddUpdate == AddOrUpdate.Add)
                             co.ID = Guid.NewGuid().ToString();
                         co.Name = txtConfigOptionName.Text;
                         co.Value = txtConfigOptionValue.Text;
@@ -380,7 +479,7 @@ namespace DevTracker.Forms
 
                         hlpr = new DHMisc();
                         var dp = DevProjects[lbDevProjects.SelectedIndex];
-                        if (_addUpdate == AddOrUpdate.Add)
+                        if (AddUpdate == AddOrUpdate.Add)
                             dp.ID = Guid.NewGuid().ToString();
                         dp.DevProjectName = txtDevProjectName.Text;
                         dp.DatabaseProject = chkDevProjectDatabaseProject.Checked;
@@ -395,7 +494,20 @@ namespace DevTracker.Forms
                         LoadDevProjects();
                         lbDevProjects.SelectedIndex = 0;
                         LoadDevProjectsControls(DevProjects[0]);
-                        lbIDEMatches.Enabled = true;
+                        lbDevProjects.Enabled = true;
+                        SetButtonsOnTabChange();
+                        break;
+                    case "tabProjectSyncs":
+                        var dlgr = MessageBox.Show("If you change the ProjectSync count, it must match the number of projects associated with this ProjecSync ID.  Are you absolutely sure you want to change the selected row?", "Be Careful", MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation);
+                        if (dlgr != DialogResult.Yes)
+                            return;
+                        hlpr = new DHMisc();
+                        var ps = ProjectSyncs[lvProjectSyncs.SelectedItems[0].Index];
+                        ps.DevProjectCount = int.Parse(txtProjectCount.Text);
+                        var rows = hlpr.UpdateProjetSyncWithProjectCount(ps);
+                        LoadProjectSyncs();
+                        lvProjectSyncs.Items[0].Selected = true;
+                        lvProjectSyncs.Enabled = true;
                         SetButtonsOnTabChange();
                         break;
                 }
@@ -409,52 +521,9 @@ namespace DevTracker.Forms
         private void DisplayValidationErrors()
         {
             MessageBox.Show(_errors, "Validation Errors", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            _errors = string.Empty;
         }
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                switch (tabControl1.SelectedTab.Name)
-                {
-                    case "tabGeneral":
-                        LoadGeneralControls();
-                        break;
-                    case "tabApplications":
-                        LoadApplicationControls(lbApplications.SelectedIndex);
-                        lbApplications.Enabled = true;
-                        break;
-                    case "tabFiles":
-                        LoadFilesControls();
-                        lbFileExtensions.Enabled = true;
-                        break;
-                    case "tabPermissions":
 
-
-                        break;
-                    case "tabMatchObjects":
-                        var m = IDEMatches[lbIDEMatches.SelectedIndex];
-                        LoadIDEMatchesControls(m);
-                        lbIDEMatches.Enabled = true;
-                        break;
-                    case "tabConfigOptions":
-                        var item = ConfigOptions[lbConfigOptions.SelectedIndex];
-                        LoadConfigOptionsControls(item);
-                        lbConfigOptions.Enabled = true;
-                        break;
-                    case "tabDevProjects":
-                        var itemDP = DevProjects[lbDevProjects.SelectedIndex];
-                        LoadDevProjectsControls(itemDP);
-                        lbDevProjects.Enabled = true;
-                        break;
-                }
-                SetButtonsOnTabChange();
-                _isDirty = false;
-            }
-            catch (Exception ex)
-            {
-                _ = new LogError(ex, true, "Options.btnCancel_Click");
-            }
-        }
         private void LoadGeneralControls()
         {
             // Cache Expiration Time
@@ -594,11 +663,20 @@ namespace DevTracker.Forms
 
                 e.Cancel = true;
             }
+
+            // Check Credentials Here  
+            if ((AppWrapper.AppWrapper.UserPermissionLevel == PermissionLevel.Admin) && (tabControl1.SelectedTab == tabPermissions))
+            {
+                tabControl1.SelectedTab = tabPermissions;
+            }
+            else if ((AppWrapper.AppWrapper.UserPermissionLevel != PermissionLevel.Admin) && (tabControl1.SelectedTab == tabPermissions))
+            {
+                MessageBox.Show("You must have Admin permission level to access the permissions tab.", "Insufficient Permission Level", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                e.Cancel = true;
+                return;
+            }
+
         }
-
-        #endregion
-
-        #region tabGeneral events
 
         #endregion
 
@@ -640,6 +718,28 @@ namespace DevTracker.Forms
             lbConfigOptions.SelectedIndex = 0;
             SetButtonsOnTabChange();
         }
+        private void LoadProjectSyncs()
+        {
+            var hlpr = new DHMisc();
+            ProjectSyncs = hlpr.GetProjectSyncs();
+            lvProjectSyncs.Items.Clear();
+            foreach (var ps in ProjectSyncs)
+            {
+                var lvi = new ListViewItem(ps.DevProjectName);
+                lvi.SubItems.Add(ps.ID);
+                lvi.SubItems.Add(ps.DevProjectCount.GetNotDBNull());
+                lvi.SubItems.Add(ps.GitURL);
+                lvi.SubItems.Add(ps.CreatedDate.ToString("MM/dd/yyyy HH:mm:ss"));
+                lvProjectSyncs.Items.Add(lvi);
+            }
+
+            if (lvProjectSyncs.Items.Count > 0)
+                lvProjectSyncs.Items[0].Selected = true;
+            lvProjectSyncs.Focus();
+            EnableDisableControls(false, tabControl1.SelectedTab.Name, false);
+            SetButtonsOnTabChange();
+        }
+
         private void LoadIDEMatches()
         {
             var hlpr = new DHMisc();
@@ -655,7 +755,22 @@ namespace DevTracker.Forms
         private void LoadPermissions()
         {
             var hlpr = new DHMisc(string.Empty);
-
+            Users = hlpr.GetUsers();
+            lvUsers.Items.Clear();
+            foreach (var user in Users)
+            {
+                var lvi = new ListViewItem(user.FirstName);
+                lvi.SubItems.Add(user.LastName);
+                lvi.SubItems.Add(user.UserName);
+                lvi.SubItems.Add(user.PermissionLevel);
+                lvi.SubItems.Add(user.CreatedDate.ToString("MM-dd=yyyy HH:mm:ss"));
+                lvi.SubItems.Add(user.CreatedBy);
+                lvi.SubItems.Add(user.UpdatedDate.ToString("MM-dd-yyyy HH:mm:ss"));
+                lvi.SubItems.Add(user.UpdatedBy);
+                lvUsers.Items.Add(lvi);
+            }
+            if (Users.Count > 0)
+                LoadPermissionControls(0);
             SetButtonsOnTabChange();
         }
 
@@ -704,6 +819,7 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabMatchObjects");
                     EnableDisableControls(false, "tabConfigOptions");
                     EnableDisableControls(false, "tabDevProjects");
+                    EnableDisableControls(false, "tabProjectSyncs");
                     break;
                 case "tabApplications":
                     EnableDisableControls(false, "tabGeneral");
@@ -712,6 +828,7 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabMatchObjects");
                     EnableDisableControls(false, "tabConfigOptions");
                     EnableDisableControls(false, "tabDevProjects");
+                    EnableDisableControls(false, "tabProjectSyncs");
                     break;
                 case "tabFiles":
                     EnableDisableControls(false, "tabApplications");
@@ -720,6 +837,7 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabMatchObjects");
                     EnableDisableControls(false, "tabConfigOptions");
                     EnableDisableControls(false, "tabDevProjects");
+                    EnableDisableControls(false, "tabProjectSyncs");
                     break;
                 case "tabPermissions":
                     EnableDisableControls(false, "tabApplications");
@@ -728,6 +846,7 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabMatchObjects");
                     EnableDisableControls(false, "tabConfigOptions");
                     EnableDisableControls(false, "tabDevProjects");
+                    EnableDisableControls(false, "tabProjectSyncs");
                     break;
                 case "tabMatchObjects":
                     EnableDisableControls(false, "tabApplications");
@@ -735,6 +854,7 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabFiles");
                     EnableDisableControls(false, "tabPermissions");
                     EnableDisableControls(false, "tabConfigOptions");
+                    EnableDisableControls(false, "tabProjectSyncs");
                     EnableDisableControls(false, "tabDevProjects");
                     break;
                 case "tabConfigOptions":
@@ -743,6 +863,7 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabFiles");
                     EnableDisableControls(false, "tabPermissions");
                     EnableDisableControls(false, "tabMatchObjects");
+                    EnableDisableControls(false, "tabProjectSyncs");
                     EnableDisableControls(false, "tabDevProjects");
                     break;
                 case "tabDevProjects":
@@ -752,6 +873,16 @@ namespace DevTracker.Forms
                     EnableDisableControls(false, "tabPermissions");
                     EnableDisableControls(false, "tabMatchObjects");
                     EnableDisableControls(false, "tabConfigOptions");
+                    EnableDisableControls(false, "tabProjectSyncs");
+                    break;
+                case "tabProjectSyncs":
+                    EnableDisableControls(false, "tabApplications");
+                    EnableDisableControls(false, "tabGeneral");
+                    EnableDisableControls(false, "tabFiles");
+                    EnableDisableControls(false, "tabPermissions");
+                    EnableDisableControls(false, "tabMatchObjects");
+                    EnableDisableControls(false, "tabConfigOptions");
+                    EnableDisableControls(false, "tabDevProjects");
                     break;
             }
         }
@@ -778,11 +909,15 @@ namespace DevTracker.Forms
                 case "tabFiles":
                     txtExtension.Enabled = enabled;
                     txtProjectFileExtension.Enabled = enabled;
+                    chkCountLines.Enabled = enabled;
                     if (clearControls)
                         ClearTabFilesControls();
                     break;
                 case "tabPermissions":
-
+                    txtFirstName.Enabled = enabled;
+                    txtLastName.Enabled = enabled;
+                    txtUserName.Enabled = enabled;
+                    cbPermissionLevel.Enabled = enabled;
                     if (clearControls)
                         ClearTabPermissionsControls();
                     break;
@@ -824,7 +959,26 @@ namespace DevTracker.Forms
                     if (clearControls)
                         ClearDevProjectsControls();
                     break;
+                case "tabProjectSyncs":
+                    txtProjectSyncName.Enabled = enabled;
+                    txtProjectSyncID.Enabled = enabled;
+                    txtProjectSyncGitUrl.Enabled = enabled;
+                    txtProjectSyncGitUrl.Enabled = enabled;
+                    txtProjectCount.Enabled = enabled;
+                    txtProjectSyncCreatedDate.Enabled = enabled;
+                    if (clearControls)
+                        ClearProjectSyncsControls();
+                    break;
             }
+        }
+
+        private void ClearProjectSyncsControls()
+        {
+            txtProjectSyncName.Clear();
+            txtProjectSyncID.Clear();
+            txtProjectSyncGitUrl.Clear();
+            txtProjectSyncGitUrl.Clear();
+            txtProjectCount.Clear();
         }
 
         private void ClearDevProjectsControls()
@@ -863,7 +1017,10 @@ namespace DevTracker.Forms
 
         private void ClearTabPermissionsControls()
         {
-            // nothing yet
+            txtFirstName.Clear();
+            txtLastName.Clear();
+            txtUserName.Clear();
+            cbPermissionLevel.SelectedIndex = 0;
         }
 
         private void ClearTabFilesControls()
@@ -898,7 +1055,6 @@ namespace DevTracker.Forms
             chkIMatchsDBEngine.Checked = false;
             chkMatchIsIDE.Checked = false;
         }
-
 
         private void SetButtonsOnTabChange()
         {
@@ -975,9 +1131,49 @@ namespace DevTracker.Forms
 
             return string.IsNullOrWhiteSpace(_errors);
         }
+
+        private bool ValidateTabPermissions()
+        {
+            if (string.IsNullOrWhiteSpace(txtFirstName.Text) ||
+                string.IsNullOrWhiteSpace(txtLastName.Text) ||
+                string.IsNullOrWhiteSpace(txtUserName.Text) ||
+                cbPermissionLevel.SelectedIndex.Equals(0))
+                _errors += "FirstName, LastName, UserName must be filled and Permission Level selected.";
+            return string.IsNullOrWhiteSpace(_errors);
+
+        }
+
+
         #endregion
 
         #region form and control event handlers
+        private void lvUsers_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (lvUsers.SelectedItems.Count != 1) return;
+
+                LoadPermissionControls(lvUsers.SelectedItems[0].Index);
+
+            }
+            catch (Exception ex)
+            {
+                _ = new LogError(ex, true, "Options.lvUsers_SelectedIndexChanged");
+            }
+        }
+        private void lvProjectSyncs_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                if (lvProjectSyncs.SelectedItems.Count < 1) return;
+                LoadProjectSyncsControls(lvProjectSyncs.SelectedItems[0].Index);
+
+            }
+            catch (Exception ex)
+            {
+                _ = new LogError(ex, true, "Options.lvProjectSyncs_SelectedIndexChanged");
+            }
+        }
 
         private void lbApplications_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -999,14 +1195,8 @@ namespace DevTracker.Forms
             }
         }
 
-
-        private void txtCacheExpirationTime_KeyUp(object sender, KeyEventArgs e)
-        {
-            _isDirty = true;
-        }
         private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
         {
-
             try
             {
                 switch (tabControl1.SelectedTab.Name)
@@ -1024,12 +1214,13 @@ namespace DevTracker.Forms
                         break;
                     case "tabPermissions":
                         DisableAllTabsButOne("tabPermissions");
-
+                        if (lvUsers.Items.Count > 0)
+                            lvUsers.Items[0].Selected = true;
+                        lvUsers.Focus();
                         break;
                     case "tabMatchObjects":
                         DisableAllTabsButOne("tabMatchOptions");
                         lbIDEMatches.SelectedIndex = 0;
-
                         break;
                     case "tabConfigOptions":
                         DisableAllTabsButOne("tabConfigOptions");
@@ -1038,6 +1229,13 @@ namespace DevTracker.Forms
                     case "tabDevProjects":
                         DisableAllTabsButOne("tabDevProjects");
                         lbDevProjects.SelectedIndex = 0;
+                        break;
+                    case "tabProjectSyncs":
+                        DisableAllTabsButOne("tabProjectSyncs");
+                        EnableDisableControls(false, "tabProjectSyncs", false);
+                        if (lvProjectSyncs.Items.Count > 0)
+                            lvProjectSyncs.Items[0].Selected = true;
+                        lvProjectSyncs.Focus();
                         break;
                 }
                 _isDirty = false;
@@ -1106,6 +1304,10 @@ namespace DevTracker.Forms
         #endregion
 
         #region make dirty events
+        private void txtCacheExpirationTime_KeyUp(object sender, KeyEventArgs e)
+        {
+            _isDirty = true;
+        }
         private void rbRecordAllFiles_CheckedChanged(object sender, EventArgs e)
         {
             _isDirty = true;
@@ -1210,12 +1412,69 @@ namespace DevTracker.Forms
         {
             _isDirty = true;
         }
+        private void txtProjectSyncName_KeyUp(object sender, KeyEventArgs e)
+        {
+            _isDirty = true;
+        }
+
+        private void txtProjectSyncID_KeyUp(object sender, KeyEventArgs e)
+        {
+            _isDirty = true;
+        }
+
+        private void txtProjectCount_KeyUp(object sender, KeyEventArgs e)
+        {
+            _isDirty = true;
+        }
+
+        private void txtProjectSyncGitUrl_KeyUp(object sender, KeyEventArgs e)
+        {
+            _isDirty = true;
+        }
+
+        private void txtProjectSyncCreatedDate_KeyUp(object sender, KeyEventArgs e)
+        {
+            _isDirty = true;
+        }
 
         private void txtConfigOptionDescription_KeyUp(object sender, KeyEventArgs e)
         {
             _isDirty = true;
         }
 
+        private void LoadProjectSyncsControls(int idx)
+        {
+            lvProjectSyncs.Enabled = true;
+            txtProjectSyncName.Text = ProjectSyncs[idx].DevProjectName;
+            txtProjectSyncID.Text = ProjectSyncs[idx].ID;
+            txtProjectSyncGitUrl.Text = ProjectSyncs[idx].GitURL;
+            txtProjectCount.Text = ProjectSyncs[idx].DevProjectCount.ToString();
+            txtProjectSyncCreatedDate.Text = ProjectSyncs[idx].CreatedDate.ToString("MM/dd/yyyy HH:mm:ss");
+        }
+
+        private void LoadPermissionControls(int idx)
+        {
+            lvUsers.Enabled = true;
+            lvUsers.Items[idx].Selected = true;
+            txtFirstName.Text = Users[idx].FirstName;
+            txtLastName.Text = Users[idx].LastName;
+            txtUserName.Text = Users[idx].UserName;
+            switch (Users[idx].PermissionLevel.ToLower())
+            {
+                case "admin":
+                    cbPermissionLevel.SelectedIndex = 1;
+                    break;
+                case "manager":
+                    cbPermissionLevel.SelectedIndex = 2;
+                    break;
+                case "developer":
+                    cbPermissionLevel.SelectedIndex = 3;
+                    break;
+                default:
+                    cbPermissionLevel.SelectedIndex = 3;
+                    break;
+            }
+        }
         #endregion
 
     }

@@ -59,19 +59,24 @@ namespace DevTracker.Forms
             this.lbFileExtensions = new System.Windows.Forms.ListBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tabPermissions = new System.Windows.Forms.TabPage();
-            this.lvUsers = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader6 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader7 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader8 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader9 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnHeader10 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.label21 = new System.Windows.Forms.Label();
+            this.label37 = new System.Windows.Forms.Label();
+            this.cbPermissionLevel = new System.Windows.Forms.ComboBox();
+            this.txtUserName = new System.Windows.Forms.TextBox();
+            this.label36 = new System.Windows.Forms.Label();
+            this.txtLastName = new System.Windows.Forms.TextBox();
             this.label20 = new System.Windows.Forms.Label();
+            this.txtFirstName = new System.Windows.Forms.TextBox();
+            this.label18 = new System.Windows.Forms.Label();
+            this.lvUsers = new System.Windows.Forms.ListView();
+            this.firstName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.lastName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.userName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.permission = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.createdDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.createdBy = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.updatedDate = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.updatedBy = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label21 = new System.Windows.Forms.Label();
             this.tabMatchObjects = new System.Windows.Forms.TabPage();
             this.txtMatchSequence = new System.Windows.Forms.TextBox();
             this.label22 = new System.Windows.Forms.Label();
@@ -108,6 +113,7 @@ namespace DevTracker.Forms
             this.lbConfigOptions = new System.Windows.Forms.ListBox();
             this.label24 = new System.Windows.Forms.Label();
             this.tabDevProjects = new System.Windows.Forms.TabPage();
+            this.label38 = new System.Windows.Forms.Label();
             this.chkDevProjectDatabaseProject = new System.Windows.Forms.CheckBox();
             this.txtDevProjectCompletedDate = new System.Windows.Forms.TextBox();
             this.txtDevProjectCreatedDate = new System.Windows.Forms.TextBox();
@@ -127,6 +133,25 @@ namespace DevTracker.Forms
             this.label28 = new System.Windows.Forms.Label();
             this.lbDevProjects = new System.Windows.Forms.ListBox();
             this.label25 = new System.Windows.Forms.Label();
+            this.tabProjectSyncs = new System.Windows.Forms.TabPage();
+            this.txtProjectSyncCreatedDate = new System.Windows.Forms.TextBox();
+            this.txtProjectSyncGitUrl = new System.Windows.Forms.TextBox();
+            this.txtProjectCount = new System.Windows.Forms.TextBox();
+            this.txtProjectSyncID = new System.Windows.Forms.TextBox();
+            this.txtProjectSyncName = new System.Windows.Forms.TextBox();
+            this.label45 = new System.Windows.Forms.Label();
+            this.label44 = new System.Windows.Forms.Label();
+            this.label43 = new System.Windows.Forms.Label();
+            this.label42 = new System.Windows.Forms.Label();
+            this.label41 = new System.Windows.Forms.Label();
+            this.label40 = new System.Windows.Forms.Label();
+            this.lvProjectSyncs = new System.Windows.Forms.ListView();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.label39 = new System.Windows.Forms.Label();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnUpdate = new System.Windows.Forms.Button();
@@ -145,6 +170,7 @@ namespace DevTracker.Forms
             this.tabMatchObjects.SuspendLayout();
             this.tabConfigOptions.SuspendLayout();
             this.tabDevProjects.SuspendLayout();
+            this.tabProjectSyncs.SuspendLayout();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -157,6 +183,7 @@ namespace DevTracker.Forms
             this.tabControl1.Controls.Add(this.tabMatchObjects);
             this.tabControl1.Controls.Add(this.tabConfigOptions);
             this.tabControl1.Controls.Add(this.tabDevProjects);
+            this.tabControl1.Controls.Add(this.tabProjectSyncs);
             this.tabControl1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.tabControl1.Location = new System.Drawing.Point(2, 6);
             this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -469,9 +496,16 @@ namespace DevTracker.Forms
             // tabPermissions
             // 
             this.tabPermissions.BackColor = System.Drawing.SystemColors.Control;
+            this.tabPermissions.Controls.Add(this.label37);
+            this.tabPermissions.Controls.Add(this.cbPermissionLevel);
+            this.tabPermissions.Controls.Add(this.txtUserName);
+            this.tabPermissions.Controls.Add(this.label36);
+            this.tabPermissions.Controls.Add(this.txtLastName);
+            this.tabPermissions.Controls.Add(this.label20);
+            this.tabPermissions.Controls.Add(this.txtFirstName);
+            this.tabPermissions.Controls.Add(this.label18);
             this.tabPermissions.Controls.Add(this.lvUsers);
             this.tabPermissions.Controls.Add(this.label21);
-            this.tabPermissions.Controls.Add(this.label20);
             this.tabPermissions.Location = new System.Drawing.Point(4, 29);
             this.tabPermissions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.tabPermissions.Name = "tabPermissions";
@@ -479,96 +513,147 @@ namespace DevTracker.Forms
             this.tabPermissions.TabIndex = 3;
             this.tabPermissions.Text = "Permissions";
             // 
+            // label37
+            // 
+            this.label37.AutoSize = true;
+            this.label37.Location = new System.Drawing.Point(11, 376);
+            this.label37.Name = "label37";
+            this.label37.Size = new System.Drawing.Size(160, 20);
+            this.label37.TabIndex = 6;
+            this.label37.Text = "Permission Level:";
+            // 
+            // cbPermissionLevel
+            // 
+            this.cbPermissionLevel.FormattingEnabled = true;
+            this.cbPermissionLevel.Items.AddRange(new object[] {
+            "",
+            "Admin",
+            "Manager",
+            "Developer"});
+            this.cbPermissionLevel.Location = new System.Drawing.Point(180, 372);
+            this.cbPermissionLevel.Name = "cbPermissionLevel";
+            this.cbPermissionLevel.Size = new System.Drawing.Size(186, 28);
+            this.cbPermissionLevel.TabIndex = 5;
+            // 
+            // txtUserName
+            // 
+            this.txtUserName.Location = new System.Drawing.Point(180, 340);
+            this.txtUserName.Name = "txtUserName";
+            this.txtUserName.Size = new System.Drawing.Size(186, 26);
+            this.txtUserName.TabIndex = 4;
+            // 
+            // label36
+            // 
+            this.label36.AutoSize = true;
+            this.label36.Location = new System.Drawing.Point(63, 347);
+            this.label36.Name = "label36";
+            this.label36.Size = new System.Drawing.Size(103, 20);
+            this.label36.TabIndex = 3;
+            this.label36.Text = "UserName:";
+            // 
+            // txtLastName
+            // 
+            this.txtLastName.Location = new System.Drawing.Point(180, 308);
+            this.txtLastName.Name = "txtLastName";
+            this.txtLastName.Size = new System.Drawing.Size(186, 26);
+            this.txtLastName.TabIndex = 4;
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(62, 315);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(106, 20);
+            this.label20.TabIndex = 3;
+            this.label20.Text = "Last Name:";
+            // 
+            // txtFirstName
+            // 
+            this.txtFirstName.Location = new System.Drawing.Point(180, 276);
+            this.txtFirstName.Name = "txtFirstName";
+            this.txtFirstName.Size = new System.Drawing.Size(186, 26);
+            this.txtFirstName.TabIndex = 4;
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.Location = new System.Drawing.Point(63, 283);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(108, 20);
+            this.label18.TabIndex = 3;
+            this.label18.Text = "First Name:";
+            // 
             // lvUsers
             // 
             this.lvUsers.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1,
-            this.columnHeader2,
-            this.columnHeader3,
-            this.columnHeader4,
-            this.columnHeader5,
-            this.columnHeader6,
-            this.columnHeader7,
-            this.columnHeader8,
-            this.columnHeader9,
-            this.columnHeader10});
+            this.firstName,
+            this.lastName,
+            this.userName,
+            this.permission,
+            this.createdDate,
+            this.createdBy,
+            this.updatedDate,
+            this.updatedBy});
             this.lvUsers.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lvUsers.FullRowSelect = true;
             this.lvUsers.GridLines = true;
             this.lvUsers.HideSelection = false;
-            this.lvUsers.Location = new System.Drawing.Point(22, 98);
+            this.lvUsers.Location = new System.Drawing.Point(22, 46);
             this.lvUsers.Name = "lvUsers";
             this.lvUsers.Size = new System.Drawing.Size(919, 215);
             this.lvUsers.TabIndex = 2;
             this.lvUsers.UseCompatibleStateImageBehavior = false;
             this.lvUsers.View = System.Windows.Forms.View.Details;
+            this.lvUsers.SelectedIndexChanged += new System.EventHandler(this.lvUsers_SelectedIndexChanged);
             // 
-            // columnHeader1
+            // firstName
             // 
-            this.columnHeader1.Text = "First Name";
-            this.columnHeader1.Width = 150;
+            this.firstName.Text = "First Name";
+            this.firstName.Width = 150;
             // 
-            // columnHeader2
+            // lastName
             // 
-            this.columnHeader2.Text = "Last Name";
-            this.columnHeader2.Width = 150;
+            this.lastName.Text = "Last Name";
+            this.lastName.Width = 150;
             // 
-            // columnHeader3
+            // userName
             // 
-            this.columnHeader3.Text = "UserName";
-            this.columnHeader3.Width = 120;
+            this.userName.Text = "UserName";
+            this.userName.Width = 120;
             // 
-            // columnHeader4
+            // permission
             // 
-            this.columnHeader4.Text = "Admin";
-            this.columnHeader4.Width = 65;
+            this.permission.Text = "Level";
+            this.permission.Width = 114;
             // 
-            // columnHeader5
+            // createdDate
             // 
-            this.columnHeader5.Text = "Manager";
-            this.columnHeader5.Width = 85;
+            this.createdDate.Text = "Created Date";
+            this.createdDate.Width = 160;
             // 
-            // columnHeader6
+            // createdBy
             // 
-            this.columnHeader6.Text = "Developer";
-            this.columnHeader6.Width = 100;
+            this.createdBy.Text = "Created By";
+            this.createdBy.Width = 120;
             // 
-            // columnHeader7
+            // updatedDate
             // 
-            this.columnHeader7.Text = "Created Date";
-            this.columnHeader7.Width = 130;
+            this.updatedDate.Text = "Updated Date";
+            this.updatedDate.Width = 160;
             // 
-            // columnHeader8
+            // updatedBy
             // 
-            this.columnHeader8.Text = "Created By";
-            this.columnHeader8.Width = 120;
-            // 
-            // columnHeader9
-            // 
-            this.columnHeader9.Text = "Updated Date";
-            this.columnHeader9.Width = 130;
-            // 
-            // columnHeader10
-            // 
-            this.columnHeader10.Text = "Updated By";
-            this.columnHeader10.Width = 130;
+            this.updatedBy.Text = "Updated By";
+            this.updatedBy.Width = 160;
             // 
             // label21
             // 
             this.label21.AutoSize = true;
-            this.label21.Location = new System.Drawing.Point(27, 70);
+            this.label21.Location = new System.Drawing.Point(27, 18);
             this.label21.Name = "label21";
             this.label21.Size = new System.Drawing.Size(59, 20);
             this.label21.TabIndex = 1;
             this.label21.Text = "Users";
-            // 
-            // label20
-            // 
-            this.label20.AutoSize = true;
-            this.label20.Location = new System.Drawing.Point(20, 26);
-            this.label20.Name = "label20";
-            this.label20.Size = new System.Drawing.Size(236, 20);
-            this.label20.TabIndex = 0;
-            this.label20.Text = "Maintain User Permissions";
             // 
             // tabMatchObjects
             // 
@@ -941,6 +1026,7 @@ namespace DevTracker.Forms
             // tabDevProjects
             // 
             this.tabDevProjects.BackColor = System.Drawing.SystemColors.Control;
+            this.tabDevProjects.Controls.Add(this.label38);
             this.tabDevProjects.Controls.Add(this.chkDevProjectDatabaseProject);
             this.tabDevProjects.Controls.Add(this.txtDevProjectCompletedDate);
             this.tabDevProjects.Controls.Add(this.txtDevProjectCreatedDate);
@@ -966,12 +1052,23 @@ namespace DevTracker.Forms
             this.tabDevProjects.TabIndex = 6;
             this.tabDevProjects.Text = "Dev Projects";
             // 
+            // label38
+            // 
+            this.label38.AutoSize = true;
+            this.label38.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label38.ForeColor = System.Drawing.Color.Red;
+            this.label38.Location = new System.Drawing.Point(13, 14);
+            this.label38.Name = "label38";
+            this.label38.Size = new System.Drawing.Size(695, 20);
+            this.label38.TabIndex = 20;
+            this.label38.Text = "NOTE: Changes to DevProjects may require changes to ProjectSync (Be Careful)";
+            // 
             // chkDevProjectDatabaseProject
             // 
             this.chkDevProjectDatabaseProject.AutoSize = true;
             this.chkDevProjectDatabaseProject.CheckAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.chkDevProjectDatabaseProject.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkDevProjectDatabaseProject.Location = new System.Drawing.Point(645, 236);
+            this.chkDevProjectDatabaseProject.Location = new System.Drawing.Point(645, 271);
             this.chkDevProjectDatabaseProject.Name = "chkDevProjectDatabaseProject";
             this.chkDevProjectDatabaseProject.Size = new System.Drawing.Size(190, 26);
             this.chkDevProjectDatabaseProject.TabIndex = 19;
@@ -981,7 +1078,7 @@ namespace DevTracker.Forms
             // txtDevProjectCompletedDate
             // 
             this.txtDevProjectCompletedDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectCompletedDate.Location = new System.Drawing.Point(644, 379);
+            this.txtDevProjectCompletedDate.Location = new System.Drawing.Point(644, 414);
             this.txtDevProjectCompletedDate.Name = "txtDevProjectCompletedDate";
             this.txtDevProjectCompletedDate.Size = new System.Drawing.Size(293, 28);
             this.txtDevProjectCompletedDate.TabIndex = 18;
@@ -989,7 +1086,7 @@ namespace DevTracker.Forms
             // txtDevProjectCreatedDate
             // 
             this.txtDevProjectCreatedDate.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectCreatedDate.Location = new System.Drawing.Point(141, 380);
+            this.txtDevProjectCreatedDate.Location = new System.Drawing.Point(141, 415);
             this.txtDevProjectCreatedDate.Name = "txtDevProjectCreatedDate";
             this.txtDevProjectCreatedDate.Size = new System.Drawing.Size(292, 28);
             this.txtDevProjectCreatedDate.TabIndex = 17;
@@ -997,7 +1094,7 @@ namespace DevTracker.Forms
             // txtDevProjectIDEAppName
             // 
             this.txtDevProjectIDEAppName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectIDEAppName.Location = new System.Drawing.Point(644, 309);
+            this.txtDevProjectIDEAppName.Location = new System.Drawing.Point(644, 344);
             this.txtDevProjectIDEAppName.Name = "txtDevProjectIDEAppName";
             this.txtDevProjectIDEAppName.Size = new System.Drawing.Size(293, 28);
             this.txtDevProjectIDEAppName.TabIndex = 16;
@@ -1005,7 +1102,7 @@ namespace DevTracker.Forms
             // txtDevProjectUserName
             // 
             this.txtDevProjectUserName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectUserName.Location = new System.Drawing.Point(644, 344);
+            this.txtDevProjectUserName.Location = new System.Drawing.Point(644, 379);
             this.txtDevProjectUserName.Name = "txtDevProjectUserName";
             this.txtDevProjectUserName.Size = new System.Drawing.Size(293, 28);
             this.txtDevProjectUserName.TabIndex = 15;
@@ -1013,7 +1110,7 @@ namespace DevTracker.Forms
             // txtDevProjectMachine
             // 
             this.txtDevProjectMachine.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectMachine.Location = new System.Drawing.Point(141, 345);
+            this.txtDevProjectMachine.Location = new System.Drawing.Point(141, 380);
             this.txtDevProjectMachine.Name = "txtDevProjectMachine";
             this.txtDevProjectMachine.Size = new System.Drawing.Size(292, 28);
             this.txtDevProjectMachine.TabIndex = 14;
@@ -1021,7 +1118,7 @@ namespace DevTracker.Forms
             // txtDevProjectITProjectID
             // 
             this.txtDevProjectITProjectID.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectITProjectID.Location = new System.Drawing.Point(141, 309);
+            this.txtDevProjectITProjectID.Location = new System.Drawing.Point(141, 344);
             this.txtDevProjectITProjectID.Name = "txtDevProjectITProjectID";
             this.txtDevProjectITProjectID.Size = new System.Drawing.Size(292, 28);
             this.txtDevProjectITProjectID.TabIndex = 13;
@@ -1029,7 +1126,7 @@ namespace DevTracker.Forms
             // txtDevProjectPath
             // 
             this.txtDevProjectPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectPath.Location = new System.Drawing.Point(141, 273);
+            this.txtDevProjectPath.Location = new System.Drawing.Point(141, 308);
             this.txtDevProjectPath.Name = "txtDevProjectPath";
             this.txtDevProjectPath.Size = new System.Drawing.Size(768, 28);
             this.txtDevProjectPath.TabIndex = 12;
@@ -1037,7 +1134,7 @@ namespace DevTracker.Forms
             // txtDevProjectName
             // 
             this.txtDevProjectName.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDevProjectName.Location = new System.Drawing.Point(141, 237);
+            this.txtDevProjectName.Location = new System.Drawing.Point(141, 272);
             this.txtDevProjectName.Name = "txtDevProjectName";
             this.txtDevProjectName.Size = new System.Drawing.Size(385, 28);
             this.txtDevProjectName.TabIndex = 11;
@@ -1045,7 +1142,7 @@ namespace DevTracker.Forms
             // label35
             // 
             this.label35.AutoSize = true;
-            this.label35.Location = new System.Drawing.Point(467, 383);
+            this.label35.Location = new System.Drawing.Point(467, 418);
             this.label35.Name = "label35";
             this.label35.Size = new System.Drawing.Size(144, 20);
             this.label35.TabIndex = 9;
@@ -1054,7 +1151,7 @@ namespace DevTracker.Forms
             // label34
             // 
             this.label34.AutoSize = true;
-            this.label34.Location = new System.Drawing.Point(11, 385);
+            this.label34.Location = new System.Drawing.Point(11, 420);
             this.label34.Name = "label34";
             this.label34.Size = new System.Drawing.Size(121, 20);
             this.label34.TabIndex = 8;
@@ -1063,7 +1160,7 @@ namespace DevTracker.Forms
             // label33
             // 
             this.label33.AutoSize = true;
-            this.label33.Location = new System.Drawing.Point(479, 314);
+            this.label33.Location = new System.Drawing.Point(479, 349);
             this.label33.Name = "label33";
             this.label33.Size = new System.Drawing.Size(132, 20);
             this.label33.TabIndex = 7;
@@ -1072,7 +1169,7 @@ namespace DevTracker.Forms
             // label32
             // 
             this.label32.AutoSize = true;
-            this.label32.Location = new System.Drawing.Point(514, 350);
+            this.label32.Location = new System.Drawing.Point(514, 385);
             this.label32.Name = "label32";
             this.label32.Size = new System.Drawing.Size(97, 20);
             this.label32.TabIndex = 6;
@@ -1081,7 +1178,7 @@ namespace DevTracker.Forms
             // label31
             // 
             this.label31.AutoSize = true;
-            this.label31.Location = new System.Drawing.Point(53, 347);
+            this.label31.Location = new System.Drawing.Point(53, 382);
             this.label31.Name = "label31";
             this.label31.Size = new System.Drawing.Size(79, 20);
             this.label31.TabIndex = 5;
@@ -1090,7 +1187,7 @@ namespace DevTracker.Forms
             // label30
             // 
             this.label30.AutoSize = true;
-            this.label30.Location = new System.Drawing.Point(16, 312);
+            this.label30.Location = new System.Drawing.Point(16, 347);
             this.label30.Name = "label30";
             this.label30.Size = new System.Drawing.Size(116, 20);
             this.label30.TabIndex = 4;
@@ -1099,7 +1196,7 @@ namespace DevTracker.Forms
             // label29
             // 
             this.label29.AutoSize = true;
-            this.label29.Location = new System.Drawing.Point(19, 277);
+            this.label29.Location = new System.Drawing.Point(19, 312);
             this.label29.Name = "label29";
             this.label29.Size = new System.Drawing.Size(113, 20);
             this.label29.TabIndex = 3;
@@ -1108,7 +1205,7 @@ namespace DevTracker.Forms
             // label28
             // 
             this.label28.AutoSize = true;
-            this.label28.Location = new System.Drawing.Point(9, 240);
+            this.label28.Location = new System.Drawing.Point(9, 275);
             this.label28.Name = "label28";
             this.label28.Size = new System.Drawing.Size(123, 20);
             this.label28.TabIndex = 2;
@@ -1119,7 +1216,7 @@ namespace DevTracker.Forms
             this.lbDevProjects.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lbDevProjects.FormattingEnabled = true;
             this.lbDevProjects.ItemHeight = 22;
-            this.lbDevProjects.Location = new System.Drawing.Point(92, 17);
+            this.lbDevProjects.Location = new System.Drawing.Point(92, 52);
             this.lbDevProjects.Name = "lbDevProjects";
             this.lbDevProjects.Size = new System.Drawing.Size(845, 202);
             this.lbDevProjects.TabIndex = 1;
@@ -1128,11 +1225,182 @@ namespace DevTracker.Forms
             // label25
             // 
             this.label25.AutoSize = true;
-            this.label25.Location = new System.Drawing.Point(6, 17);
+            this.label25.Location = new System.Drawing.Point(6, 52);
             this.label25.Name = "label25";
             this.label25.Size = new System.Drawing.Size(79, 20);
             this.label25.TabIndex = 0;
             this.label25.Text = "Projects";
+            // 
+            // tabProjectSyncs
+            // 
+            this.tabProjectSyncs.BackColor = System.Drawing.SystemColors.Control;
+            this.tabProjectSyncs.Controls.Add(this.txtProjectSyncCreatedDate);
+            this.tabProjectSyncs.Controls.Add(this.txtProjectSyncGitUrl);
+            this.tabProjectSyncs.Controls.Add(this.txtProjectCount);
+            this.tabProjectSyncs.Controls.Add(this.txtProjectSyncID);
+            this.tabProjectSyncs.Controls.Add(this.txtProjectSyncName);
+            this.tabProjectSyncs.Controls.Add(this.label45);
+            this.tabProjectSyncs.Controls.Add(this.label44);
+            this.tabProjectSyncs.Controls.Add(this.label43);
+            this.tabProjectSyncs.Controls.Add(this.label42);
+            this.tabProjectSyncs.Controls.Add(this.label41);
+            this.tabProjectSyncs.Controls.Add(this.label40);
+            this.tabProjectSyncs.Controls.Add(this.lvProjectSyncs);
+            this.tabProjectSyncs.Controls.Add(this.label39);
+            this.tabProjectSyncs.Location = new System.Drawing.Point(4, 29);
+            this.tabProjectSyncs.Name = "tabProjectSyncs";
+            this.tabProjectSyncs.Size = new System.Drawing.Size(964, 475);
+            this.tabProjectSyncs.TabIndex = 7;
+            this.tabProjectSyncs.Text = "Project Syncs";
+            // 
+            // txtProjectSyncCreatedDate
+            // 
+            this.txtProjectSyncCreatedDate.Location = new System.Drawing.Point(147, 389);
+            this.txtProjectSyncCreatedDate.Name = "txtProjectSyncCreatedDate";
+            this.txtProjectSyncCreatedDate.Size = new System.Drawing.Size(483, 26);
+            this.txtProjectSyncCreatedDate.TabIndex = 33;
+            this.txtProjectSyncCreatedDate.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtProjectSyncCreatedDate_KeyUp);
+            // 
+            // txtProjectSyncGitUrl
+            // 
+            this.txtProjectSyncGitUrl.Location = new System.Drawing.Point(146, 357);
+            this.txtProjectSyncGitUrl.Name = "txtProjectSyncGitUrl";
+            this.txtProjectSyncGitUrl.Size = new System.Drawing.Size(484, 26);
+            this.txtProjectSyncGitUrl.TabIndex = 32;
+            this.txtProjectSyncGitUrl.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtProjectSyncGitUrl_KeyUp);
+            // 
+            // txtProjectCount
+            // 
+            this.txtProjectCount.Location = new System.Drawing.Point(146, 325);
+            this.txtProjectCount.Name = "txtProjectCount";
+            this.txtProjectCount.Size = new System.Drawing.Size(49, 26);
+            this.txtProjectCount.TabIndex = 31;
+            this.txtProjectCount.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtProjectCount_KeyUp);
+            // 
+            // txtProjectSyncID
+            // 
+            this.txtProjectSyncID.Location = new System.Drawing.Point(146, 293);
+            this.txtProjectSyncID.Name = "txtProjectSyncID";
+            this.txtProjectSyncID.Size = new System.Drawing.Size(484, 26);
+            this.txtProjectSyncID.TabIndex = 30;
+            this.txtProjectSyncID.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtProjectSyncID_KeyUp);
+            // 
+            // txtProjectSyncName
+            // 
+            this.txtProjectSyncName.Location = new System.Drawing.Point(146, 260);
+            this.txtProjectSyncName.Name = "txtProjectSyncName";
+            this.txtProjectSyncName.Size = new System.Drawing.Size(484, 26);
+            this.txtProjectSyncName.TabIndex = 29;
+            this.txtProjectSyncName.KeyUp += new System.Windows.Forms.KeyEventHandler(this.txtProjectSyncName_KeyUp);
+            // 
+            // label45
+            // 
+            this.label45.AutoSize = true;
+            this.label45.Location = new System.Drawing.Point(12, 392);
+            this.label45.Name = "label45";
+            this.label45.Size = new System.Drawing.Size(127, 20);
+            this.label45.TabIndex = 28;
+            this.label45.Text = "Created Date:";
+            // 
+            // label44
+            // 
+            this.label44.AutoSize = true;
+            this.label44.Location = new System.Drawing.Point(60, 360);
+            this.label44.Name = "label44";
+            this.label44.Size = new System.Drawing.Size(79, 20);
+            this.label44.TabIndex = 27;
+            this.label44.Text = "git URL:";
+            // 
+            // label43
+            // 
+            this.label43.AutoSize = true;
+            this.label43.Location = new System.Drawing.Point(9, 328);
+            this.label43.Name = "label43";
+            this.label43.Size = new System.Drawing.Size(130, 20);
+            this.label43.TabIndex = 26;
+            this.label43.Text = "Project Count:";
+            // 
+            // label42
+            // 
+            this.label42.AutoSize = true;
+            this.label42.Location = new System.Drawing.Point(58, 296);
+            this.label42.Name = "label42";
+            this.label42.Size = new System.Drawing.Size(81, 20);
+            this.label42.TabIndex = 25;
+            this.label42.Text = "Sync ID:";
+            // 
+            // label41
+            // 
+            this.label41.AutoSize = true;
+            this.label41.Location = new System.Drawing.Point(10, 262);
+            this.label41.Name = "label41";
+            this.label41.Size = new System.Drawing.Size(129, 20);
+            this.label41.TabIndex = 24;
+            this.label41.Text = "Project Name:";
+            // 
+            // label40
+            // 
+            this.label40.AutoSize = true;
+            this.label40.Location = new System.Drawing.Point(11, 46);
+            this.label40.Name = "label40";
+            this.label40.Size = new System.Drawing.Size(79, 20);
+            this.label40.TabIndex = 23;
+            this.label40.Text = "Projects";
+            // 
+            // lvProjectSyncs
+            // 
+            this.lvProjectSyncs.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnHeader1,
+            this.columnHeader2,
+            this.columnHeader3,
+            this.columnHeader4,
+            this.columnHeader5});
+            this.lvProjectSyncs.FullRowSelect = true;
+            this.lvProjectSyncs.HideSelection = false;
+            this.lvProjectSyncs.Location = new System.Drawing.Point(97, 42);
+            this.lvProjectSyncs.MultiSelect = false;
+            this.lvProjectSyncs.Name = "lvProjectSyncs";
+            this.lvProjectSyncs.Size = new System.Drawing.Size(844, 193);
+            this.lvProjectSyncs.TabIndex = 22;
+            this.lvProjectSyncs.UseCompatibleStateImageBehavior = false;
+            this.lvProjectSyncs.View = System.Windows.Forms.View.Details;
+            this.lvProjectSyncs.SelectedIndexChanged += new System.EventHandler(this.lvProjectSyncs_SelectedIndexChanged);
+            // 
+            // columnHeader1
+            // 
+            this.columnHeader1.Text = "Project Name";
+            this.columnHeader1.Width = 160;
+            // 
+            // columnHeader2
+            // 
+            this.columnHeader2.Text = "ID (Sync)";
+            this.columnHeader2.Width = 220;
+            // 
+            // columnHeader3
+            // 
+            this.columnHeader3.Text = "Project Count";
+            this.columnHeader3.Width = 136;
+            // 
+            // columnHeader4
+            // 
+            this.columnHeader4.Text = "git URL";
+            this.columnHeader4.Width = 203;
+            // 
+            // columnHeader5
+            // 
+            this.columnHeader5.Text = "Created Date";
+            this.columnHeader5.Width = 193;
+            // 
+            // label39
+            // 
+            this.label39.AutoSize = true;
+            this.label39.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label39.ForeColor = System.Drawing.Color.Red;
+            this.label39.Location = new System.Drawing.Point(22, 13);
+            this.label39.Name = "label39";
+            this.label39.Size = new System.Drawing.Size(695, 20);
+            this.label39.TabIndex = 21;
+            this.label39.Text = "NOTE: Changes to ProjectSync may require changes to DevProjects (Be Careful)";
             // 
             // btnAdd
             // 
@@ -1174,7 +1442,7 @@ namespace DevTracker.Forms
             this.btnSave.Size = new System.Drawing.Size(80, 35);
             this.btnSave.TabIndex = 18;
             this.btnSave.Text = "Save";
-            this.toolTip1.SetToolTip(this.btnSave, "Update changes to application");
+            this.toolTip1.SetToolTip(this.btnSave, "Update changes to selected Tab\'s controls");
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
@@ -1185,7 +1453,7 @@ namespace DevTracker.Forms
             this.btnCancel.Size = new System.Drawing.Size(80, 35);
             this.btnCancel.TabIndex = 19;
             this.btnCancel.Text = "Ca&ncel";
-            this.toolTip1.SetToolTip(this.btnCancel, "Update changes to application");
+            this.toolTip1.SetToolTip(this.btnCancel, "Cancel changes to current tab\'s controls");
             this.btnCancel.UseVisualStyleBackColor = true;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
@@ -1227,6 +1495,7 @@ namespace DevTracker.Forms
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Options";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "DevTracker - Options";
             this.Load += new System.EventHandler(this.Options_Load);
             this.tabControl1.ResumeLayout(false);
@@ -1247,6 +1516,8 @@ namespace DevTracker.Forms
             this.tabConfigOptions.PerformLayout();
             this.tabDevProjects.ResumeLayout(false);
             this.tabDevProjects.PerformLayout();
+            this.tabProjectSyncs.ResumeLayout(false);
+            this.tabProjectSyncs.PerformLayout();
             this.panel1.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -1300,18 +1571,15 @@ namespace DevTracker.Forms
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label19;
         private System.Windows.Forms.ListView lvUsers;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader firstName;
+        private System.Windows.Forms.ColumnHeader lastName;
         private System.Windows.Forms.Label label21;
-        private System.Windows.Forms.Label label20;
-        private System.Windows.Forms.ColumnHeader columnHeader3;
-        private System.Windows.Forms.ColumnHeader columnHeader4;
-        private System.Windows.Forms.ColumnHeader columnHeader5;
-        private System.Windows.Forms.ColumnHeader columnHeader6;
-        private System.Windows.Forms.ColumnHeader columnHeader7;
-        private System.Windows.Forms.ColumnHeader columnHeader8;
-        private System.Windows.Forms.ColumnHeader columnHeader9;
-        private System.Windows.Forms.ColumnHeader columnHeader10;
+        private System.Windows.Forms.ColumnHeader userName;
+        private System.Windows.Forms.ColumnHeader permission;
+        private System.Windows.Forms.ColumnHeader createdDate;
+        private System.Windows.Forms.ColumnHeader createdBy;
+        private System.Windows.Forms.ColumnHeader updatedDate;
+        private System.Windows.Forms.ColumnHeader updatedBy;
         private System.Windows.Forms.TextBox txtMatchSequence;
         private System.Windows.Forms.Label label22;
         private System.Windows.Forms.TextBox txtMatchAlternateProjectName;
@@ -1358,5 +1626,33 @@ namespace DevTracker.Forms
         private System.Windows.Forms.ComboBox cbApplications;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.CheckBox chkCountLines;
+        private System.Windows.Forms.Label label37;
+        private System.Windows.Forms.ComboBox cbPermissionLevel;
+        private System.Windows.Forms.TextBox txtUserName;
+        private System.Windows.Forms.Label label36;
+        private System.Windows.Forms.TextBox txtLastName;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.TextBox txtFirstName;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label38;
+        private System.Windows.Forms.TabPage tabProjectSyncs;
+        private System.Windows.Forms.TextBox txtProjectSyncCreatedDate;
+        private System.Windows.Forms.TextBox txtProjectSyncGitUrl;
+        private System.Windows.Forms.TextBox txtProjectCount;
+        private System.Windows.Forms.TextBox txtProjectSyncID;
+        private System.Windows.Forms.TextBox txtProjectSyncName;
+        private System.Windows.Forms.Label label45;
+        private System.Windows.Forms.Label label44;
+        private System.Windows.Forms.Label label43;
+        private System.Windows.Forms.Label label42;
+        private System.Windows.Forms.Label label41;
+        private System.Windows.Forms.Label label40;
+        private System.Windows.Forms.ListView lvProjectSyncs;
+        private System.Windows.Forms.ColumnHeader columnHeader2;
+        private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.ColumnHeader columnHeader3;
+        private System.Windows.Forms.ColumnHeader columnHeader4;
+        private System.Windows.Forms.ColumnHeader columnHeader5;
+        private System.Windows.Forms.Label label39;
     }
 }

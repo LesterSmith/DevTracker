@@ -105,109 +105,22 @@ namespace DevTracker.Classes
         /// <param name="idChild"></param>
         /// <param name="dwEventThread"></param>
         /// <param name="dwmsEventTime"></param>
-        //public void WinEventProc_old(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
-        //{
-        //    try
-        //    {
-        //        if (_busy)
-        //        {
-        //            // dont throw away events, wait
-        //            while (_busy)
-        //                Thread.Sleep(10);
-        //        }
-        //        _busy = true;
-
-        //        Process p = GetAppProcess(hwnd);
-
-        //        if (p == null)
-        //        {
-        //            _busy = false;
-        //            return;
-        //        }
-
-        //        // create a new WindowEvents object to process the window change
-        //        var we = new WindowEvents(p, null); // Log);
-
-        //        #region moved to WindowEvents class
-        //        //var moduleName = p.MainModule.ModuleName;
-        //        //var s = string.Format("Start: {3}  Title: {0}     AppName: {1}    ModuleName: {2}", GetActiveWindowTitle(), p.ProcessName, moduleName, DateTime.Now.ToString());
-        //        //var now = DateTime.Now;
-        //        //var title = GetActiveWindowTitle();
-        //        //if (title == null) return;
-        //        //if (title == "Window Change Log" || title == "Project Description" || p.ProcessName == "DevTracker" || p.ProcessName == "explorer")
-        //        //    return;
-        //        //ListViewItem lvi = new ListViewItem(now.ToString("MM/dd/yyyy HH:mm:ss"));
-        //        //lvi.SubItems.Add(title);
-        //        //lvi.SubItems.Add(p.ProcessName);   // appName                    //GetAppName(hwnd, out moduleName));
-        //        //lvi.SubItems.Add(moduleName);
-        //        //TimeSpan elapsedTime = now - _startTime;
-        //        //_startTime = now;
-        //        //lvi.SubItems.Add("");// elapsedTime.ToString());
-        //        //if (p.ProcessName == "devenv")
-        //        //{
-        //        //    var patt = "^(?<PrjName>.*?) - Microsoft Visual Studio";
-        //        //    var m = Regex.Match(title, patt);
-        //        //    var prjName = string.Empty;
-        //        //    if (m.Success && m.Groups["PrjName"] != null)
-        //        //    {
-        //        //        prjName = m.Groups["PrjName"].Value.Replace("(Running)", string.Empty).Replace("(Debugging)", string.Empty).Trim();
-        //        //    }
-        //        //    lvi.SubItems.Add(prjName);
-        //        //}
-        //        //else
-        //        //    lvi.SubItems.Add(p.ProcessName);
-        //        //lvi.SubItems.Add(""); //ID
-        //        //lvi.SubItems.Add("");  // desc
-        //        //lvi.SubItems.Add(p.StartInfo.WorkingDirectory);
-        //        //var known = GetProjectIdIfKnown(lvi);
-        //        //if (known)
-        //        //    UpdateAllItems();
-        //        //if (Log.Items.Count >0)
-        //        //    Log.Items[Log.Items.Count-1].SubItems[4].Text = elapsedTime.ToString();
-        //        //Log.Items.Add(lvi);
-        //        ////if (!Log.IsScrollbarUserControlled)
-        //        ////{
-        //        //    Log.Items[Log.Items.Count - 1].EnsureVisible();
-        //        ////}
-        //        ///
-        //        #endregion
-
-        //        _busy = false;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        MessageBox.Show(ex.Message, AppWrapper.AppWrapper.ProgramError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-        //        _busy = false;
-        //    }
-        //}
-
-        //NOTE WinEventProcess Change
-
 
         /// <summary>
         /// This is the new method designed to queue process in Globals.WindowQueue
         /// It will then create a new windowsevent object to process the queue
         /// 
-        /// NOTE: You can put breakpoints in here, but if you do, then writing becomes iffy in spite of
-        /// all that I have done to queue and thread, there are still issues in debugging
+        /// NOTE: You can put breakpoints in here, but if you do, then writing becomes iffy 
         /// b/c stopping in here changes the window event
-        /// This method fires every time a new window gets focus.  It is called from Windows b/c
-        /// we have registered to be be called by calling SetWinEventHook
-        /// 
-        /// NOTE: we may be calling this from a new timer class passing nulls to all params
+        /// This method fires every time a new window gets focus.  
+        /// NOTE: we are calling this from a new timer class passing nulls to all params
         /// except hwnd bc none of the others is used in event handling
         /// Calling SetWinEventHook is causing an bad slowdown when connected to high speed
         /// internet (possibly caused by processing going on behind the scenes in windows, I
         /// really have not been able to figure it out, just figured that is what causes the
-        /// slowdown and poll is hopefully going to work better on the developers machine.)
+        /// slowdown and poll is going to work better on the developers machine without any
+        /// significant cpu usage < 1%)
         /// </summary>
-        /// <param name="hWinEventHook"></param>
-        /// <param name="eventType"></param>
-        /// <param name="hwnd"></param>
-        /// <param name="idObject"></param>
-        /// <param name="idChild"></param>
-        /// <param name="dwEventThread"></param>
-        /// <param name="dwmsEventTime"></param>
         public void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             try
@@ -292,9 +205,10 @@ namespace DevTracker.Classes
                         ? gawtTitle : !string.IsNullOrWhiteSpace(mwTitle)
                         ? mwTitle : $"Unknown title from {currentApp}";
 
-                    if (Globals.LastWindowEvent.WindowTitle.StartsWith("Unknown"))
+                    if (title.StartsWith("Unknown"))
                     {
-                        _ = new LogError($"WindowChangeEvent, Bad Title from Title: {title}, GetActiveWindowTitle= '{title}'", false, "WindowChangeEvents.WinEventProc");
+                        if (!title.Contains("DevTracker"))
+                            _ = new LogError($"WindowChangeEvent, Bad Title from Title: {title}, GetActiveWindowTitle= '{title}'", false, "WindowChangeEvents.WinEventProc");
                     }
 
                     if (currentApp == "ssms" && title.Contains("Microsoft Visual Studio"))
@@ -329,8 +243,7 @@ namespace DevTracker.Classes
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message, AppWrapper.AppWrapper.ProgramError, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                //_busy = false;
+                _ = new LogError(ex, false, "WindowChangeEvents.WinEventsProc");
             }
         }
 

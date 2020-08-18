@@ -10,7 +10,7 @@ using DevTrackerLogging;
 namespace DevTracker.Classes
 {
     /// <summary>
-    /// We are only interested in development associated file, not just general 
+    /// We are only interested in development associated files, not just general 
     /// files.  Only files which are known to be dev files or in a dev project path
     /// determines if the file path matches a known project path and
     /// thereby denotes whether the file is of interest to us
@@ -55,14 +55,13 @@ namespace DevTracker.Classes
                 // Rather it is to help maintain the DevProjects Table with the best information posssible
                 // so that the WindowEvents class can charge the project and to report back to the windowevents
                 // LastWindowEvent the project being worked on by the currentapp
-
                 string syncID = null;
                 var ext = Path.GetExtension(fc.FullPath).Replace(".", string.Empty).ToLower();
                 var devPath = string.Empty;
                 var devProject = string.Empty;
                 var relativeFileName = string.Empty; // filename past the pathname
 
-                // but we should check to see if the file being saved is a .xxproj file, then and only then should
+                // but we should check to see if the file being saved is a .xxproj file,
                 // we check for "CheckForInsertingNewProjectPath"
                 var projFileObject = Globals.NotableFiles.Find(x => x.Extension == ext);
                 var ideMatch = Globals.IDEMatches.Find(x => x.AppName == fc.CurrentApp);
@@ -155,9 +154,6 @@ namespace DevTracker.Classes
                         Tuple<string, string, string> tuple = mp.GetProjectFromDevFileSave(fc.FullPath, Globals.NotableFiles, ext);
                         if (tuple == null || string.IsNullOrWhiteSpace(tuple.Item1))
                         {
-                            // remove next line b/c it is writing false positive problems, e.g.,
-                            // a .dll not written to a project path will log an error falsely 7/1/20
-                            //_ = new LogError($"FileAnalyzer Missing Data, Project: {fc.ProjectName}  Path: {devPath} FileFullPath: {fc.FullPath}", false, "FileAnalyzer.ctor");
                             goto TopOfCode;
                         }
                         else
@@ -205,7 +201,7 @@ namespace DevTracker.Classes
                     if (projObj == null) goto TopOfCode;
                     fc.ProjectName = projObj.Item1;
                     devPath = projObj.Item2;
-
+                    
                     syncID = mp.CheckForInsertingNewProjectPath(
                         new DevProjPath
                         {

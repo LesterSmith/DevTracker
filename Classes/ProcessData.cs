@@ -97,20 +97,6 @@ namespace DevTracker.Classes
             return null;
         }
 
-        //public static Process GetAppProcess(IntPtr hwnd) //, out string modName)
-        //{
-        //    Process p = null;
-        //    try
-        //    {
-        //        Int32 pid = win32.GetWindowProcessID(hwnd);
-        //        p = Process.GetProcessById(pid);
-        //        return p;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //    }
-        //    return p;// appName;
-        //}
         private static Process GetActiveProcess(out IntPtr hanWnd)
         {
             IntPtr hwnd = GetForegroundWindow();

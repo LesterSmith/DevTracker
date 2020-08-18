@@ -8,6 +8,7 @@ using BusinessObjects;
 using DataHelpers;
 using System.DirectoryServices.AccountManagement;
 using DevTracker.Classes;
+using AppWrapper;
 
 namespace DevTracker.Forms
 {
@@ -37,7 +38,10 @@ namespace DevTracker.Forms
             this.Top = -5000;
             // run startup init processes
             // get configuration variables & start caching timer
-            Classes.Startup.Init();
+            Startup.Init(); // will setup cached data
+            CloseMenuItem.Visible = AppWrapper.AppWrapper.UserPermissionLevel == PermissionLevel.Admin || AppWrapper.AppWrapper.UserPermissionLevel == PermissionLevel.Manager;
+            OptionsForm.Visible = AppWrapper.AppWrapper.UserPermissionLevel == PermissionLevel.Admin || AppWrapper.AppWrapper.UserPermissionLevel == PermissionLevel.Manager;
+
         }
 
         private void InitializeComponent2()
